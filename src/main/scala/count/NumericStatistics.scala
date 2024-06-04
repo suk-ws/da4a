@@ -54,7 +54,7 @@ class NumericStatistics [T] (using role: Numeric[T]) {
 	  * @return The [[NumericStatistics]] itself for chained call.
 	  */
 	@targetName("collect")
-	def ++ (newOne: T): this.type =
+	infix def ++ (newOne: T): this.type =
 		state match
 			case Some(current) =>
 				if (role.lt(newOne, current.min)) current.min = newOne
