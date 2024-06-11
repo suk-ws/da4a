@@ -14,6 +14,7 @@ import scala.annotation.targetName
   *             required for numeric calculation.
   * @tparam T The exactly number type
   */
+@deprecated("Current in WIP state")
 class NumericStatistics [T] (using role: Numeric[T]) {
 	
 	/** Statistic state values.

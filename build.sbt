@@ -23,6 +23,7 @@ ThisBuild / resolvers ++= ProjectMetadata.resolvers
 
 val encoding = "UTF-8"
 val javaTarget = "1.8"
+val javaTarget_scala = "8"
 
 lazy val root = (project in file("."))
 	.settings(
@@ -39,6 +40,10 @@ lazy val root = (project in file("."))
 		
 		libraryDependencies ++= ProjectMetadata.dependencies,
 		
+		Compile / doc / scalacOptions ++= Seq(
+			"-private",
+		),
+		
 		scalacOptions ++= Seq(
 			"-language:postfixOps",
 			"-language:experimental.macros",
@@ -48,8 +53,10 @@ lazy val root = (project in file("."))
 			"-Yexplicit-nulls",
 			"-Ysafe-init",
 			"-unchecked",
+			"-explain",
 			"-explain-types",
 			"-encoding", encoding,
+			"-release", javaTarget_scala,
 		),
 		javacOptions ++= Seq(
 			"-encoding", encoding,
