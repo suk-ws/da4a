@@ -36,7 +36,12 @@ code used in multiple projects.
 
 Current features:
 
-- Scala DSL for some commonly used math operator (`/-/`(over), `*^`(pow))
+- Scala DSLs provide a way to do more simple jobs easier
+  - some commonly used math operator (`/-/`(over), `*^`(pow))
+  - extension methods to encapsulate values to scala base data types
+- Library Tools
+  - GivenContext -— put(provide) and get(use) variables using its type as
+    the key
 - Series random utils (currently only weighted boolean)
 - Numeric Statistics from the Morny project.
 
