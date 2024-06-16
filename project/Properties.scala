@@ -7,7 +7,7 @@ object Properties {
 	val package_id: String = s"$package_group.std"
 	val version: String = "0.1.0"
 	
-	val SNAPSHOT: Boolean = true
+	val SNAPSHOT: Boolean = false
 	
 	val dependencyRepos: Seq[Resolver] = Seq(
 		Resolvers.ws_release
