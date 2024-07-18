@@ -5,9 +5,9 @@ object Properties {
 	val package_name :String = "da4a"
 	val package_group: String = "cc.sukazyo"
 	val package_id: String = s"$package_group.std"
-	val version: String = "0.1.0"
+	val version: String = "0.2.0"
 	
-	val SNAPSHOT: Boolean = false
+	val SNAPSHOT: Boolean = true
 	
 	val dependencyRepos: Seq[Resolver] = Seq(
 		Resolvers.ws_release
@@ -15,7 +15,7 @@ object Properties {
 	
 	val dependencies: Seq[ModuleID] = Seq(
 		
-		"cc.sukazyo" % "resource-tools" % "0.2.2" % Test,
+		"cc.sukazyo" % "resource-tools" % "0.3.0" % Test,
 		
 		"org.scalatest" %% "scalatest"          % "3.2.18" % Test,
 		"org.scalatest" %% "scalatest-freespec" % "3.2.18" % Test,

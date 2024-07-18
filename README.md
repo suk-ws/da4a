@@ -1,4 +1,4 @@
-# data (?)
+# da4a (?)
 
 [badge_release_img]: https://img.shields.io/github/v/release/suk-ws/da4a?display_name=release&label=latest&color=#00fa9a
 [badge_release_target]: https://mvn.sukazyo.cc/#/releases/cc/sukazyo/da4a
