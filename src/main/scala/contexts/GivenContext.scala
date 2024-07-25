@@ -7,14 +7,47 @@ import stacks.WithCurrentStack
 import scala.collection.mutable
 import scala.reflect.{classTag, ClassTag}
 
+/** The constructor and inner classes of [[GivenContext]].
+  */
 object GivenContext {
+	
+	/** Create a new [[GivenContext]].
+	  * 
+	  * @since 0.2.0
+	  */
+	def apply (): GivenContext =
+		new GivenContext()
+	
+	/** Clone a new [[GivenContext]] from an old one.
+	  * 
+	  * @see [[GivenContext.clone]]
+	  *      
+	  * @since 0.2.0
+	  */
+	def from (source: GivenContext): GivenContext =
+		source.clone()
+	
+	private type ImplicitsMap [T <: Any] = mutable.HashMap[Class[?], T]
 	
 	case class FolderClass (clazz: Option[Class[?]])
 	object FolderClass:
 		def default: FolderClass = FolderClass(None)
 	case class RequestItemClass (clazz: Class[?])
 	
+	/**
+	  * There are no requested item in current [[GivenContext]].
+	  * 
+	  * @param cxt The [[GivenContext]] that this request is on.
+	  * @param requestItemClass The requesting item's [[Class]] tag.
+	  * @param folderClass The requesting item's owner [[OwnedContext]]'s [[Class]] tag.
+	  *                    If the requesting owned scope is the global scope, this is `None`,
+	  *                    or else this will be a [[Some]] of a [[Class]].
+	  * @param requestStack where this request is sent from.
+	  * 
+	  * @since 0.1.0
+	  */
 	class ContextNotGivenException (using
+		val cxt: GivenContext,
 		val requestItemClass: RequestItemClass,
 		val folderClass: FolderClass = FolderClass.default,
 		val requestStack: StackTraceElement = WithCurrentStack.getStackHeadBeforeClass[GivenContext]
@@ -68,12 +101,59 @@ object GivenContext {
   * @since 0.1.0
   */
 //noinspection NoTargetNameAnnotationForOperatorLikeDefinition
-class GivenContext {
-	
-	private type ImplicitsMap [T <: Any] = mutable.HashMap[Class[?], T]
-	
-	private val variables: ImplicitsMap[Any] = mutable.HashMap.empty
+class GivenContext private (
+	private val variables: ImplicitsMap[Any] = mutable.HashMap.empty,
 	private val variablesWithOwner: ImplicitsMap[ImplicitsMap[Any]] = mutable.HashMap.empty
+) extends mutable.Cloneable[GivenContext] {
+	
+	given GivenContext = this
+	
+	/** Create a shallow copy of current [[GivenContext]] instance, with the same data, but
+	  * operating on the returned copy will not affect current instance or other copy.
+	  *
+	  * Notice that this is a shallow copy, means it only copies which class is referenced to
+	  * which object, it will not copy the object itself. So that, if the object itself is
+	  * immutable, changing the object will make other copies referenced to it change too.
+	  *
+	  * @example
+	  * {{{
+	  *     val oldContext = GivenContext()
+	  *     oldContext.provide[Int](1)
+	  *     oldContext.use[Int] // will be 1
+	  *     val newContext = oldContext.clone()
+	  *     newContext.use[Int] // will be 1, copied from the oldContext
+	  *
+	  *     newContext.provide[Int](128)
+	  *     newContext.use[Int] // now will be 128 due to it has changed
+	  *     oldContext.use[Int] // will be still 1
+	  *
+	  *     oldContext.provide[ListBuffer[?]] = ListBuffer("old value")
+	  *     oldContext.use[ListBuffer[?]] // will be ListBuffer("old value")
+	  *     val brandNewContext = oldContext.clone()
+	  *     brandNewContext.use[ListBuffer[String]].addOne("new value")
+	  *     brandNewContext.use[ListBuffer[?]] // will be ListBuffer("old value", "new value")
+	  *     oldContext.use[ListBuffer[?]] // will be ListBuffer("old value", "new value"), due
+	  *                                   // to the oldContext and brandNewContext is all referenced
+	  *                                   // to the same ListBuffer
+	  *
+	  *     oldContext.provide[ListBuffer[?]] = ListBuffer("new buffer")
+	  *     oldContext.use[ListBuffer[String]].addOne("Hello World!")
+	  *     oldContext.use[ListBuffer[?]] // will be ListBuffer("new buffer", "Hello World")
+	  *     brandNewContext.use[ListBuffer[?]] // will be ListBuffer("old value", "new value"),
+	  *                                        // due to the oldContext and brandNewContext now
+	  *                                        // referenced to different ListBuffers
+	  *
+	  * }}}
+	  * 
+	  * @return A shallow copy of the current [[GivenContext]].
+	  *         
+	  * @since 0.2.0
+	  */
+	override def clone (): GivenContext =
+		new GivenContext(
+			variables.map(_ -> _),
+			variablesWithOwner.map(_ -> _.map(_ -> _))
+		)
 	
 	/** The total context variables count only in the global scopes.
 	  *
@@ -232,7 +312,7 @@ class GivenContext {
 	infix def >!> [T: ClassTag] (t: Class[T]): T =
 		this.use[T].toTry.get
 	/** @since 0.1.0 */
-	infix def >>[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
+	infix def >> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 		this.use[T,U](consumer)
 	/** @since 0.1.0 */
 	infix def consume [T: ClassTag] (consume: T => Any): ConsumeResult[Any] =
