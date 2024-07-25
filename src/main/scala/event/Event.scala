@@ -12,9 +12,9 @@ import scala.collection.mutable
   */
 trait Event [T, R] {
 	
-	private type Func = Function[T, R]
+	type X = Function[T, R]
 	
-	private val _listeners: mutable.Map[Object, Func] = mutable.HashMap.empty
+	private val _listeners: mutable.Map[Object, X] = mutable.HashMap.empty
 	
 	/**
 	  * Setup a listener to this event. The listener will be called when the event is triggered.
@@ -33,7 +33,7 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def addListener (key: Object)(func: Func): Unit =
+	def addListener (key: Object)(func: X): Unit =
 		_listeners += (key, func)
 	
 	/**
@@ -49,8 +49,44 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def addListener (func: Func): Unit =
+	def addListener (func: X): Unit =
 		this.addListener(key = func)(func)
+	
+	/**
+	  * Setup a listener to this event. The listener will be called when the event is triggered.
+	  *
+	  * @param key  The key of this listener.
+	  *
+	  *             If another listener with the same key is already added, then that one will
+	  *             be automatically removed when this new listener is added.
+	  *
+	  *             You can also remove this listener later using <code>[[removeListener]](key)</code>
+	  * @param func A function, will be called when the event is triggered. aka the listener of
+	  *             this event.
+	  *
+	  *             Based on the differences usage, the event might be triggered multi times and
+	  *             this listener will be called multi times also.
+	  *
+	  * @since 0.2.0
+	  */
+	def += (it: (Object, X)): Unit =
+		this.addListener(it._1)(it._2)
+	
+	/**
+	  * Setup a listener to this event.
+	  *
+	  * @param func A function that will be called when the event is triggered. aka the listener
+	  *             of this event.
+	  *
+	  *             Also this function itself will be the key of this listener,  means you can
+	  *             remove this listener later using <code>[[removeListener]](func)</code>.
+	  *
+	  * @see [[addListener(Object)(Func)]]
+	  *
+	  * @since 0.2.0
+	  */
+	def += (func: X): Unit =
+		this.addListener(func)
 	
 	/**
 	  * Remove a listener by the key of the listener.
@@ -61,7 +97,7 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def removeListener (obj: Object): Option[Func] =
+	def removeListener (obj: Object): Option[X] =
 		_listeners.remove(obj)
 	
 	/**
@@ -69,7 +105,7 @@ trait Event [T, R] {
 	  *
 	  * the map's key is a listener's key, and the value is the listener function.
 	  */
-	def listeners: Map[Object, Func] =
+	def listeners: Map[Object, X] =
 		_listeners.toMap
 	
 	/**
@@ -81,7 +117,10 @@ trait Event [T, R] {
 	def apply (params: T): List[R] =
 		_listeners.values
 			.toList
-			.map(_.apply(params))
+			.map(this.invoking(params)(_))
+	
+	private def invoking (params: T)(listener: X): R =
+		listener.apply(params)
 	
 }
 
