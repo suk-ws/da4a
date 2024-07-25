@@ -4,7 +4,9 @@ package contexts
 import contexts.GivenContext.*
 import stacks.WithCurrentStack
 
+import java.util.function.Consumer as JConsumer
 import scala.collection.mutable
+import scala.jdk.FunctionConverters.*
 import scala.reflect.{classTag, ClassTag}
 
 /** The constructor and inner classes of [[GivenContext]].
@@ -12,19 +14,19 @@ import scala.reflect.{classTag, ClassTag}
 object GivenContext {
 	
 	/** Create a new [[GivenContext]].
-	  * 
+	  *
 	  * @since 0.2.0
 	  */
 	def apply (): GivenContext =
-		new GivenContext()
+		new GivenContext(mutable.HashMap.empty, mutable.HashMap.empty)
 	
 	/** Clone a new [[GivenContext]] from an old one.
-	  * 
+	  *
 	  * @see [[GivenContext.clone]]
-	  *      
+	  *
 	  * @since 0.2.0
 	  */
-	def from (source: GivenContext): GivenContext =
+	def from (source: GivenContext): GivenContext = // TODO: docs and tests
 		source.clone()
 	
 	private type ImplicitsMap [T <: Any] = mutable.HashMap[Class[?], T]
@@ -36,14 +38,14 @@ object GivenContext {
 	
 	/**
 	  * There are no requested item in current [[GivenContext]].
-	  * 
+	  *
 	  * @param cxt The [[GivenContext]] that this request is on.
 	  * @param requestItemClass The requesting item's [[Class]] tag.
 	  * @param folderClass The requesting item's owner [[OwnedContext]]'s [[Class]] tag.
 	  *                    If the requesting owned scope is the global scope, this is `None`,
 	  *                    or else this will be a [[Some]] of a [[Class]].
 	  * @param requestStack where this request is sent from.
-	  * 
+	  *
 	  * @since 0.1.0
 	  */
 	class ContextNotGivenException (using
@@ -102,11 +104,21 @@ object GivenContext {
   */
 //noinspection NoTargetNameAnnotationForOperatorLikeDefinition
 class GivenContext private (
-	private val variables: ImplicitsMap[Any] = mutable.HashMap.empty,
-	private val variablesWithOwner: ImplicitsMap[ImplicitsMap[Any]] = mutable.HashMap.empty
+	private val variables: ImplicitsMap[Any],
+	private val variablesWithOwner: ImplicitsMap[ImplicitsMap[Any]]
 ) extends mutable.Cloneable[GivenContext] {
 	
 	given GivenContext = this
+	
+	/** Create a brand new [[GivenContext]].
+	  *
+	  * @since 0.1.0
+	  * @deprecated This is only for source/binary capability purpose. You should use the simple
+	  *             factory method [[GivenContext.apply]] instead.
+	  */
+	@deprecated("Use GivenContext.apply() instead", "da4a 0.2.0")
+	def this () =
+		this(mutable.HashMap.empty, mutable.HashMap.empty)
 	
 	/** Create a shallow copy of current [[GivenContext]] instance, with the same data, but
 	  * operating on the returned copy will not affect current instance or other copy.
@@ -144,12 +156,12 @@ class GivenContext private (
 	  *                                        // referenced to different ListBuffers
 	  *
 	  * }}}
-	  * 
+	  *
 	  * @return A shallow copy of the current [[GivenContext]].
-	  *         
+	  *
 	  * @since 0.2.0
 	  */
-	override def clone (): GivenContext =
+	override def clone (): GivenContext = // TODO: docs and tests
 		new GivenContext(
 			variables.map(_ -> _),
 			variablesWithOwner.map(_ -> _.map(_ -> _))
@@ -230,6 +242,8 @@ class GivenContext private (
 	def ownedScopes: List[OwnedContext] =
 		variablesWithOwner.map((k, v) => new OwnedContext(k)).toList
 	
+	infix def provide [T] (clazz: Class[T], i: T): Unit =
+		variables += (clazz -> i)
 	/** Add one context parameter to the global scope in this [[GivenContext]].
 	  *
 	  * The parameter's type is its key in the context. It can be get by [[use]] series of
@@ -262,7 +276,7 @@ class GivenContext private (
 	  * @since 0.1.0
 	  */
 	infix def provide [T: ClassTag] (i: T): Unit =
-		variables += (classTag[T].runtimeClass -> i)
+		this.provide(classTag[T].runtimeClass.asInstanceOf[Class[T]], i)
 	/** Provide a context variable to the global scope, with the variable key is the given
 	  * class.
 	  *
@@ -293,30 +307,78 @@ class GivenContext private (
 	infix def << [T: ClassTag] (i: T): Unit =
 		this.provide[T](i)
 	
-	/** @since 0.1.0 */
-	def use [T: ClassTag]: CxtOption[T] =
-		given t: RequestItemClass = RequestItemClass(classTag[T].runtimeClass)
+	/// #block get
+	///   get one to a CxtOption
+	/** @since 0.1.0
+	  * @deprecated For more complex use cases with less conflict, use [[get]] instead.
+	  */
+	@deprecated("Use get instead.", "da4a 0.2.0")
+	def use [T: ClassTag]: CxtOption[T] = this.get
+	/** @since 0.2.0 */
+	infix def get [T] (clazz: Class[T]): CxtOption[T] = // TODO: docs and tests
+		given t: RequestItemClass = RequestItemClass(clazz)
 		//noinspection DuplicatedCode
 		variables get t.clazz match
 			case Some(i) => Right(i.asInstanceOf[T])
 			case None => Left(ContextNotGivenException())
-	/** @since 0.1.0 */
-	infix def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
-		this.use[T] match
-			case Left(_) => ConsumeFailed[U]()
-			case Right(i) => ConsumeSucceed[U](consumer(i))
+	/** @since 0.2.0 */
+	def get [T: ClassTag]: CxtOption[T] = // TODO: docs and tests
+		this.get(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 	/** @since 0.1.0 */
 	infix def >> [T: ClassTag] (t: Class[T]): CxtOption[T] =
-		this.use[T]
+		this.get[T]
+	
+	/// #block getOrNull
+	///   get one, or returns null
+	/** @since 0.2.0 */
+	infix def getOrNull [T] (clazz: Class[T]): T | Null = // TODO: docs and tests
+		this.get(clazz)
+			.getOrElse(null)
+	/** @since 0.2.0 */
+	def getOrNull [T: ClassTag]: T | Null = // TODO: docs and tests
+		this.getOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	/** @since 0.2.0 */
+	infix def >?> [T: ClassTag] (t: Class[T]): T | Null = // TODO: docs and tests
+		this.getOrNull[T]
+	
+	/// #block unsafeGet
+	///   get one, or throws an exception
+	/** @since 0.2.0 */
+	@throws[ContextNotGivenException]
+	infix def getUnsafe [T] (clazz: Class[T]): T = // TODO: docs and tests
+		this.get(clazz)
+			.toTry.get
+	/** @since 0.2.0 */
+	@throws[ContextNotGivenException]
+	def getUnsafe [T: ClassTag]: T = // TODO: docs and tests
+		this.getUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 	/** @since 0.1.0 */
+	@throws[ContextNotGivenException]
 	infix def >!> [T: ClassTag] (t: Class[T]): T =
-		this.use[T].toTry.get
+		this.getUnsafe[T]
+	
+	/// #block use
+	///   directly use one by consumer
+	/** @since 0.2.0 */
+	def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = // TODO: docs and tests
+		this.get[T](clazz) match
+			case Left(e) => ConsumeFailed[U](e)
+			case Right(i) => ConsumeSucceed[U](consumer(i))
+	/** @since 0.1.0 */
+	infix def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
+		this.use[T,U](classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
 	/** @since 0.1.0 */
 	infix def >> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 		this.use[T,U](consumer)
+	/** @since 0.2.0 */
+	def consume [T] (clazz: Class[T])(consumer: T => Any): ConsumeResult[Any] = // TODO: docs and tests
+		this.use[T,Any](clazz)(consumer)
 	/** @since 0.1.0 */
-	infix def consume [T: ClassTag] (consume: T => Any): ConsumeResult[Any] =
-		this.use[T,Any](consume)
+	infix def consume [T: ClassTag] (consumer: T => Any): ConsumeResult[Any] =
+		this.use[T,Any](consumer)
+	/** @since 0.2.0 */
+	def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] = // TODO: docs and tests
+		this.use[T,Unit](clazz)(jConsumer.asScala)
 	
 	/** Get the [[OwnedContext]] connects to the owner class given.
 	  *
@@ -342,6 +404,9 @@ class GivenContext private (
 	  */
 	def ownedBy [O: ClassTag]: OwnedContext =
 		OwnedContext(classTag[O].runtimeClass)
+	/** @since 0.2.0 */
+	def ownedBy [O] (clazz: Class[O]): OwnedContext = // TODO: docs and tests
+		OwnedContext(clazz)
 	
 	/** An access helper for a owned context in the [[GivenContext]].
 	  *
@@ -359,7 +424,7 @@ class GivenContext private (
 	  *
 	  * @since 0.1.0
 	  */
-	class OwnedContext (thisClazz: Class[?]) {
+	class OwnedContext (thisClazz: Class[?]) { // TODO: add java capability methods
 		private given folderClass: FolderClass = FolderClass(Some(thisClazz))
 		
 		private def getThisMap: Option[ImplicitsMap[Any]] =
@@ -422,7 +487,7 @@ class GivenContext private (
 		/** @since 0.1.0 */
 		infix def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 			use[T] match
-				case Left(_) => ConsumeFailed[U]()
+				case Left(e) => ConsumeFailed[U](e)
 				case Right(i) => ConsumeSucceed[U](consumer(i))
 		/** @since 0.1.0 */
 		infix def >> [T: ClassTag] (t: Class[T]): CxtOption[T] =
@@ -439,16 +504,16 @@ class GivenContext private (
 		
 	}
 	
-	/** The result context of [[GivenContext.consume]] operation.
+	/** The result context of [[GivenContext.consuming]] operation.
 	  *
-	  * Gives a way to do the most useful following operation after the [[GivenContext.consume]].
+	  * Gives a way to do the most useful following operation after the [[GivenContext.consuming]].
 	  * Mostly depends on whether the consumer function executes successfully or not.
 	  *
 	  * Notice that once the consumer function is called, is is seen as succeed . The exception
 	  * throws in the original consumer function will be just throws to the caller, not
 	  * handled by this context.
 	  *
-	  * @tparam U The type of the return value that should returns by [[GivenContext.consume]]'s
+	  * @tparam U The type of the return value that should returns by [[GivenContext.consuming]]'s
 	  *           consumer function.
 	  *
 	  * @since 0.1.0
@@ -513,13 +578,24 @@ class GivenContext private (
 		  */
 		def ||[P] (processor: => P): U | P = orElse(processor)
 		
+		// TODO: docs and tests
+		def orNull: U | Null = orElse(null)
+		
+		// TODO: docs and tests
+		@throws[ContextNotGivenException]
+		def ensureSuccess: U
+		
 	}
 	private class ConsumeSucceed[U] (succeedValue: U) extends ConsumeResult[U]:
 		private def get: U = succeedValue
 		override def toOption: Some[U] = Some(get)
 		override def orElse[P] (processor: =>P): U|P = get
-	private class ConsumeFailed[U] extends ConsumeResult[U]:
+		@throws[ContextNotGivenException]
+		def ensureSuccess: U = get
+	private class ConsumeFailed[U] (e: ContextNotGivenException) extends ConsumeResult[U]:
 		override def toOption: None.type = None
 		override def orElse[P] (processor: =>P): U|P = processor
+		@throws[ContextNotGivenException]
+		def ensureSuccess: U = throw e
 	
 }

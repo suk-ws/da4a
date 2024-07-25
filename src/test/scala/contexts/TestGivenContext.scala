@@ -10,10 +10,10 @@ class TestGivenContext extends BaseTestsSuite {
 		
 		"should be able to created" - {
 			
-			"using new method" - {
+			"using new keyword" in {
 				assertCompiles("val a: GivenContext = new GivenContext()")
 			}
-			"using apply method" - {
+			"using apply method" in {
 				assertCompiles("val a: GivenContext = GivenContext.apply()")
 				assertCompiles("val a: GivenContext = GivenContext()")
 			}
