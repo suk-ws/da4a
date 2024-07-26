@@ -36,8 +36,7 @@ object GivenContext {
 		def default: FolderClass = FolderClass(None)
 	case class RequestItemClass (clazz: Class[?])
 	
-	/**
-	  * There are no requested item in current [[GivenContext]].
+	/** There are no requested item in current [[GivenContext]].
 	  *
 	  * @param cxt The [[GivenContext]] that this request is on.
 	  * @param requestItemClass The requesting item's [[Class]] tag.
@@ -242,7 +241,8 @@ class GivenContext private (
 	def ownedScopes: List[OwnedContext] =
 		variablesWithOwner.map((k, v) => new OwnedContext(k)).toList
 	
-	infix def provide [T] (clazz: Class[T], i: T): Unit =
+	/** @since 0.2.0 */
+	infix def provide [T] (clazz: Class[T], i: T): Unit = // TODO: docs and tests
 		variables += (clazz -> i)
 	/** Add one context parameter to the global scope in this [[GivenContext]].
 	  *
@@ -325,8 +325,8 @@ class GivenContext private (
 	def get [T: ClassTag]: CxtOption[T] = // TODO: docs and tests
 		this.get(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 	/** @since 0.1.0 */
-	infix def >> [T: ClassTag] (t: Class[T]): CxtOption[T] =
-		this.get[T]
+	infix def >> [T] (t: Class[T]): CxtOption[T] =
+		this.get(t)
 	
 	/// #block getOrNull
 	///   get one, or returns null
@@ -338,8 +338,8 @@ class GivenContext private (
 	def getOrNull [T: ClassTag]: T | Null = // TODO: docs and tests
 		this.getOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 	/** @since 0.2.0 */
-	infix def >?> [T: ClassTag] (t: Class[T]): T | Null = // TODO: docs and tests
-		this.getOrNull[T]
+	infix def >?> [T] (t: Class[T]): T | Null = // TODO: docs and tests
+		this.getOrNull(t)
 	
 	/// #block unsafeGet
 	///   get one, or throws an exception
@@ -354,8 +354,8 @@ class GivenContext private (
 		this.getUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 	/** @since 0.1.0 */
 	@throws[ContextNotGivenException]
-	infix def >!> [T: ClassTag] (t: Class[T]): T =
-		this.getUnsafe[T]
+	infix def >!> [T] (t: Class[T]): T =
+		this.getUnsafe(t)
 	
 	/// #block use
 	///   directly use one by consumer
@@ -457,11 +457,15 @@ class GivenContext private (
 		  */
 		def nonEmpty: Boolean = getThisMap.exists(_.nonEmpty)
 		
+		/** @see [[GivenContext.provide(Class[T],T)*]]
+		  * @since 0.2.0 */
+		infix def provide [T] (clazz: Class[T], i: T): Unit = // TODO: tests
+			getThisMapOrCreate.addOne(clazz -> i)
 		/** @see [[GivenContext.provide]]
 		  * @since 0.1.0
 		  */
 		infix def provide [T: ClassTag] (i: T): Unit =
-			getThisMapOrCreate.addOne(classTag[T].runtimeClass -> i)
+			this.provide(classTag[T].runtimeClass.asInstanceOf[Class[T]], i)
 		/** @see [[GivenContext.<<(i:(Class[T],T))*]]
 		  * @since 0.1.0
 		  */
@@ -474,9 +478,14 @@ class GivenContext private (
 		infix def << [T: ClassTag] (i: T): Unit =
 			this.provide[T](i)
 		
-		/** @since 0.1.0 */
-		def use [T: ClassTag]: CxtOption[T] =
-			given t: RequestItemClass = RequestItemClass(classTag[T].runtimeClass)
+		/** @since 0.1.0
+		  * @deprecated For more complex use cases with less conflict, use [[get]] instead.
+		  */
+		@deprecated("Use get instead.", "da4a 0.2.0")
+		def use [T: ClassTag]: CxtOption[T] = this.get
+		/** @since 0.2.0 */
+		infix def get [T] (clazz: Class[T]): CxtOption[T] = // TODO: tests
+			given t: RequestItemClass = RequestItemClass(clazz)
 			variablesWithOwner get thisClazz match
 				case Some(varColl) =>
 					//noinspection DuplicatedCode
@@ -484,23 +493,57 @@ class GivenContext private (
 						case Some(i) => Right(i.asInstanceOf[T])
 						case None => Left(ContextNotGivenException())
 				case None => Left(ContextNotGivenException())
+		def get [T: ClassTag]: CxtOption[T] =
+			this.get(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 		/** @since 0.1.0 */
-		infix def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
-			use[T] match
+		infix def >> [T] (t: Class[T]): CxtOption[T] =
+			this.get(t)
+		
+		/** @since 0.2.0 */
+		infix def getOrNull [T] (clazz: Class[T]): T | Null = // TODO: tests
+			this.get(clazz)
+				.getOrElse(null)
+		/** @since 0.2.0 */
+		def getOrNull [T: ClassTag]: T| Null =
+			this.getOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		/** @since 0.2.0 */
+		infix def >?> [T] (t: Class[T]): T | Null = // TODO: tests
+			this.getOrNull(t)
+			
+		/** @since 0.2.0 */
+		@throws[ContextNotGivenException]
+		infix def getUnsafe[T] (clazz: Class[T]): T = // TODO: docs
+			this.get(clazz)
+				.toTry.get
+		/** @since 0.2.0 */
+		@throws[ContextNotGivenException]
+		def getUnsafe[T: ClassTag]: T = // TODO: docs
+			this.getUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		/** @since 0.1.0 */
+		@throws[ContextNotGivenException]
+		infix def >!>[T] (t: Class[T]): T =
+			this.getUnsafe(t)
+		
+		/** @since 0.2.0 */
+		def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = // TODO: tests
+			this.get(clazz) match
 				case Left(e) => ConsumeFailed[U](e)
 				case Right(i) => ConsumeSucceed[U](consumer(i))
 		/** @since 0.1.0 */
-		infix def >> [T: ClassTag] (t: Class[T]): CxtOption[T] =
-			this.use[T]
-		/** @since 0.1.0 */
-		infix def >!> [T: ClassTag] (t: Class[T]): T =
-			this.use[T].toTry.get
+		infix def use [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
+			this.use[T,U](classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
 		/** @since 0.1.0 */
 		infix def >> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 			this.use[T,U](consumer)
+		/** @since 0.2.0 */
+		def consume [T] (clazz: Class[T])(consumer: T => Any): ConsumeResult[Any] = // TODO: tests
+			this.use[T,Any](clazz)(consumer)
 		/** @since 0.1.0 */
 		infix def consume [T: ClassTag] (consume: T => Any): ConsumeResult[Any] =
 			this.use[T,Any](consume)
+		/** @since 0.2.0 */
+		def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] = // TODO: tests
+			this.use[T,Unit](clazz)(jConsumer.asScala)
 		
 	}
 	
