@@ -5,6 +5,8 @@ import scala.reflect.{classTag, ClassTag}
 import scala.util.boundary
 import scala.util.boundary.break
 
+trait WithCurrentStack {}
+
 object WithCurrentStack {
 	
 	class EmptyStackException extends RuntimeException
@@ -25,9 +27,10 @@ object WithCurrentStack {
 	@noinline
 	@throws[SecurityException]
 	def getStackTrace (offset: Int = 0): Array[StackTraceElement] = {
-		val _offset = offset + 2
-		val origins = Thread.currentThread.asInstanceOf[Thread].getStackTrace.asInstanceOf[Array[StackTraceElement]]
-		origins.drop(_offset)
+		Thread.currentThread.asInstanceOf[Thread].getStackTrace.asInstanceOf[Array[StackTraceElement]]
+			.drop(1)
+			.dropWhile(s => s.getClassName == classOf[WithCurrentStack].getName || s.getClassName == classOf[WithCurrentStack.type].getName)
+			.drop(offset)
 	}
 	
 	/**
@@ -72,7 +75,7 @@ object WithCurrentStack {
 	@throws[SecurityException | EmptyStackException]
 	def getStackHeadBeforeClass (clazz: Class[?]): StackTraceElement = {
 		boundary {
-			for (stack <- getStackTrace(1)) {
+			for (stack <- getStackTrace()) {
 				if (!stack.getClassName.asInstanceOf[String].startsWith(clazz.getName))
 					break(stack)
 			}
