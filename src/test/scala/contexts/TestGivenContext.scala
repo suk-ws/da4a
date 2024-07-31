@@ -21,34 +21,97 @@ class TestGivenContext extends BaseTestsSuite {
 		}
 		
 		"just created" - {
-			val newContext = GivenContext()
-			"should be empty" - {
-				"in total" in {
-					/*_*/newContext.size shouldBe 0/*_*/
-					/*_*/newContext.isEmpty shouldBe true/*_*/
-					newContext.nonEmpty shouldBe false
-				}
-				"in global scope" in {
-					newContext.sizeGlobal shouldBe 0
-					newContext.isEmptyGlobal shouldBe true
-					newContext.nonEmptyGlobal shouldBe false
-				}
-				"in every owned scope" in {
-					newContext.ownedScopes.foreach { scope =>
-						scope.size shouldBe 0
-						scope.isEmpty shouldBe true
-						scope.nonEmpty shouldBe false
+			val table = Table(
+				("name", "generator"),
+				("by new keyword", () => new GivenContext()),
+				("by apply method", () => GivenContext.apply()),
+			)
+			forAll(table) { (name: String, generator: ()=>GivenContext) => s"$name" - {
+				"should be empty" - {
+					"in total" in {
+						val newContext = generator()
+						newContext.size shouldBe 0
+						newContext.isEmpty shouldBe true
+						newContext.nonEmpty shouldBe false
+					}
+					"in global scope" in {
+						val newContext = generator()
+						newContext.sizeGlobal shouldBe 0
+						newContext.isEmptyGlobal shouldBe true
+						newContext.nonEmptyGlobal shouldBe false
+					}
+					"in every owned scope" in {
+						val newContext = generator()
+						newContext.ownedScopes.foreach { scope =>
+							scope.size shouldBe 0
+							scope.isEmpty shouldBe true
+							scope.nonEmpty shouldBe false
+						}
 					}
 				}
-			}
+			}}
+		}
+		
+		"copied from other one" - {
+			type Copier = GivenContext=>GivenContext
+			def contexts (copier: Copier): (GivenContext, GivenContext) =
+				val original = GivenContext()
+				original << "old string"
+				original.ownedBy[GivenContext] << "owned old string"
+				(original, copier(original))
+			val table = Table[String, Copier](
+				("name", "copier"),
+				("by instances clone() method", cxt=>cxt.clone()),
+				("by static from() method", cxt=>GivenContext.from(cxt)),
+			)
+			forAll(table) { (name, copier) => s"$name" - {
+				
+				"should have the same size" in {
+					val (original, copy) = contexts(copier)
+					original.size shouldBe copy.size
+					original.sizeGlobal shouldBe copy.sizeGlobal
+					original.ownedBy[GivenContext].size shouldBe copy.ownedBy[GivenContext].size
+				}
+				
+				"should have the same data" in {
+					val (original, copy) = contexts(copier)
+					original.get[String] shouldBe copy.get[String]
+					original.ownedBy[GivenContext].get[String] shouldBe copy.ownedBy[GivenContext].get[String]
+				}
+				
+				"changing it should not affect the original one" in {
+					val (original, copy) = contexts(copier)
+					copy << "new string"
+					copy.ownedBy[GivenContext] << "owned new string"
+					copy.getUnsafe[String] shouldBe "new string"
+					copy.ownedBy[GivenContext].getUnsafe[String] shouldBe "owned new string"
+					original.getUnsafe[String] shouldBe "old string"
+					original.ownedBy[GivenContext].getUnsafe[String] shouldBe "owned old string"
+				}
+				
+				"changing the origin should not affect the copy one" in {
+					val (original, copy) = contexts(copier)
+					original << "new string"
+					original.ownedBy[GivenContext] << "owned new string"
+					original.getUnsafe[String] shouldBe "new string"
+					original.ownedBy[GivenContext].getUnsafe[String] shouldBe "owned new string"
+					copy.getUnsafe[String] shouldBe "old string"
+					copy.ownedBy[GivenContext].getUnsafe[String] shouldBe "owned old string"
+				}
+				
+			}}
 		}
 		
 		"should be able to get owned scopes" - {
 			
 			"specifically owned by one Class" - {
-				"using ownedBy method" in:
+				"using ownedBy method with ClassTag" in:
 					val _c = GivenContext()
 					val stringOwned = _c.ownedBy[String]
+					stringOwned.isOwnedBy(classOf[String])
+				"using ownedBy method with Class instance" in:
+					val _c = GivenContext()
+					val stringOwned = _c.ownedBy(classOf[String])
 					stringOwned.isOwnedBy(classOf[String])
 				"using ownedBy operation `/` with Class[?] tag" in:
 					val _c = GivenContext()
@@ -101,7 +164,6 @@ class TestGivenContext extends BaseTestsSuite {
 		}
 		
 		"should be able to take out a value" - {
-			import GivenContext.CxtOption
 			
 			"in global scope" - {
 				val _c = GivenContext()

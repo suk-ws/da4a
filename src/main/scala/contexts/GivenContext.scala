@@ -10,6 +10,8 @@ import scala.jdk.FunctionConverters.*
 import scala.reflect.{classTag, ClassTag}
 
 /** The constructor and inner classes of [[GivenContext]].
+  * 
+  * @since 0.1.0
   */
 object GivenContext {
 	
@@ -26,14 +28,18 @@ object GivenContext {
 	  *
 	  * @since 0.2.0
 	  */
-	def from (source: GivenContext): GivenContext = // TODO: docs and tests
+	def from (source: GivenContext): GivenContext =
 		source.clone()
 	
 	private type ImplicitsMap [T <: Any] = mutable.HashMap[Class[?], T]
 	
+	/** @since 0.1.0 */
 	case class FolderClass (clazz: Option[Class[?]])
+	/** @since 0.1.0 */
 	object FolderClass:
+		/** @since 0.1.0 */
 		def default: FolderClass = FolderClass(None)
+	/** @since 0.1.0 */
 	case class RequestItemClass (clazz: Class[?])
 	
 	/** There are no requested item in current [[GivenContext]].
@@ -56,6 +62,10 @@ object GivenContext {
 		s"None of the ${requestItemClass.clazz.getSimpleName} is in the context${folderClass.clazz.map(" and owned by " + _.getSimpleName).getOrElse("")}, which is required by $requestStack."
 	)
 	
+	/** The return type of [[GivenContext.get]], contains [[Either]] the got value as [[Right]],
+	  * or a [[ContextNotGivenException]] as [[Left]].
+	  * @since 0.1.0
+	  */
 	type CxtOption[T] = Either[ContextNotGivenException, T]
 	
 }
@@ -160,7 +170,7 @@ class GivenContext private (
 	  *
 	  * @since 0.2.0
 	  */
-	override def clone (): GivenContext = // TODO: docs and tests
+	override def clone (): GivenContext =
 		new GivenContext(
 			variables.map(_ -> _),
 			variablesWithOwner.map(_ -> _.map(_ -> _))
@@ -405,7 +415,7 @@ class GivenContext private (
 	def ownedBy [O: ClassTag]: OwnedContext =
 		OwnedContext(classTag[O].runtimeClass)
 	/** @since 0.2.0 */
-	def ownedBy [O] (clazz: Class[O]): OwnedContext = // TODO: docs and tests
+	def ownedBy [O] (clazz: Class[O]): OwnedContext =
 		OwnedContext(clazz)
 	
 	/** An access helper for a owned context in the [[GivenContext]].
@@ -576,6 +586,20 @@ class GivenContext private (
 		  */
 		def toOption: Option[U]
 		
+		/** The result of the consumer function in [[Either]] format.
+		  * 
+		  * If the consumer fails to execute for any reason (mostly the required context variable
+		  * is not exists), this function will returns [[Left]] of the [[ContextNotGivenException]].
+		  * The consumer throws exception will just be throws to the caller, not handled by this
+		  * method.
+		  * 
+		  * @return [[Right]] of the consumer function returns value, or [[Left]] of the exceptions
+		  *         while try to run the consumer function.
+		  *         
+		  * @since 0.2.0
+		  */
+		def toEither: Either[ContextNotGivenException, U] // TODO: docs and tests
+		
 		/** Returns the result of the consumer function.
 		  *
 		  * If the consumer fails to execute for any reason, this function will returns [[None]].
@@ -621,9 +645,27 @@ class GivenContext private (
 		  */
 		def ||[P] (processor: => P): U | P = orElse(processor)
 		
-		// TODO: docs and tests
+		/** Get the result of this consumer function, or [[Null]] if the consumer cannot execute
+		  * in some reason (most likely when the required context variable is not exists).
+		  *
+		  * This is relatively equals to `this.toOption.orNull`, or `this.orElse(null)`.
+		  *
+		  * @return The consumer function returns value itself, or `null` value.
+		  *
+		  * @since 0.2.0
+		  */
 		def orNull: U | Null = orElse(null)
 		
+		/** Get the result of this consumer function, or just throws an exception if the consumer
+		  * cannot execute in some reason (most likely when the required context variable is not
+		  * exists).
+		  *
+		  * @throws ContextNotGivenException if the consumer cannot execute due to the required
+		  *                                  context parameter is not exists in this context.
+		  * @return The consumer function returns value itself.
+		  *         
+		  * @since 0.2.0
+		  */
 		// TODO: docs and tests
 		@throws[ContextNotGivenException]
 		def ensureSuccess: U
@@ -632,11 +674,13 @@ class GivenContext private (
 	private class ConsumeSucceed[U] (succeedValue: U) extends ConsumeResult[U]:
 		private def get: U = succeedValue
 		override def toOption: Some[U] = Some(get)
+		override def toEither: Either[ContextNotGivenException, U] = Right(get)
 		override def orElse[P] (processor: =>P): U|P = get
 		@throws[ContextNotGivenException]
 		def ensureSuccess: U = get
 	private class ConsumeFailed[U] (e: ContextNotGivenException) extends ConsumeResult[U]:
 		override def toOption: None.type = None
+		override def toEither: Either[ContextNotGivenException, U] = Left(e)
 		override def orElse[P] (processor: =>P): U|P = processor
 		@throws[ContextNotGivenException]
 		def ensureSuccess: U = throw e

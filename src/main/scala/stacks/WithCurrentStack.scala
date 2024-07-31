@@ -9,6 +9,10 @@ trait WithCurrentStack {}
 
 object WithCurrentStack {
 	
+	/** Indicates that current stack becomes empty after processed.
+	  *
+	  * @since 0.1.0
+	  */
 	class EmptyStackException extends RuntimeException
 	
 	/** Get the current stack trace, and drop the first n nearest stack depends on the offset
@@ -33,6 +37,26 @@ object WithCurrentStack {
 			.drop(offset)
 	}
 	
+	/** Get the current stack trace, and drop the first n nearest stack depends on the offset
+	  * value given.
+	  *
+	  * Defaults the offset is 0, indicating the stack from the caller of this method. For
+	  * example, if the call stack is like { main -> a -> b -> c }, and this method is called
+	  * in function c(), then the returned stack will be { c, b, a, main }. If the offset is
+	  * set to 1, then the returned stack will be { b, a, main }.
+	  *
+	  * @throws SecurityException if a security manager exists and its checkPermission method
+	  *                           doesn't allow getting the stack trace of current thread.
+	  *
+	  * @see [[getStackTrace(Int)]]
+	  *
+	  * @since 0.2.0
+	  */
+	@noinline
+	@throws[SecurityException]
+	def getStackTrace: Array[StackTraceElement] =
+		getStackTrace(0)
+	
 	/**
 	  * Get the last [[StackTraceElement]] in current stack traces that is not in the given
 	  * class.
@@ -50,7 +74,8 @@ object WithCurrentStack {
 	  *                             thread is just called in the main method etc.
 	  * @return The last(most recent) stack trace element that is not in the given class
 	  */
-	@throws[SecurityException | EmptyStackException]
+	@throws[SecurityException]
+	@throws[EmptyStackException]
 	def getStackHeadBeforeClass[T: ClassTag]: StackTraceElement = {
 		getStackHeadBeforeClass(classTag[T].runtimeClass)
 	}
@@ -72,10 +97,11 @@ object WithCurrentStack {
 	  *                             thread is just called in the main method etc.
 	  * @return The last(most recent) stack trace element that is not in the given class
 	  */
-	@throws[SecurityException | EmptyStackException]
+	@throws[SecurityException]
+	@throws[EmptyStackException]
 	def getStackHeadBeforeClass (clazz: Class[?]): StackTraceElement = {
 		boundary {
-			for (stack <- getStackTrace()) {
+			for (stack <- getStackTrace) {
 				if (!stack.getClassName.asInstanceOf[String].startsWith(clazz.getName))
 					break(stack)
 			}
