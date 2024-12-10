@@ -1,4 +1,4 @@
-# da4a (?)
+# <img src="./da4a-icon.svg" width="24"> da4a (?)
 
 [badge_release_img]: https://img.shields.io/github/v/release/suk-ws/da4a?display_name=release&label=latest&color=#00fa9a
 [badge_release_target]: https://mvn.sukazyo.cc/#/releases/cc/sukazyo/da4a
@@ -36,6 +36,8 @@ code used in multiple projects.
 
 Current features:
 
+- Bytes data processing
+  - Convert a singed byte (or a byte array) to a HEX string
 - Scala DSLs provide a way to do more simple jobs easier
   - some commonly used math operator (`/-/`(over), `*^`(pow))
   - extension methods to encapsulate values to scala base data types
