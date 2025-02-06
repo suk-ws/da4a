@@ -9,6 +9,21 @@ import scala.collection.generic.DefaultSerializable
 import scala.collection.mutable.{ReusableBuilder, SeqOps}
 import scala.jdk.CollectionConverters.*
 
+/** LinkedList implementation for scala.
+  * 
+  * It wrappers the Java [[JLinkedList]] class, and provides a scala-like interface.
+  * 
+  * Comparing to the normal [[List]] or [[ListBuffer]], it implements some additional base
+  * traits to provide more efficient linked list operations:
+  * 
+  * - [[InPlaceSortable]]: Sort the list in place.
+  * - [[IteratingOps]]: Provides some additional operations, for doing some operations while in
+  *   iteration.
+  * 
+  * @since 0.2.0
+  * 
+  * @tparam E Type of the elements in the collection.
+  */
 class LinkedList [E]
 	extends mutable.AbstractBuffer[E]
 		with InPlaceSortable[E]
@@ -92,6 +107,10 @@ class LinkedList [E]
 	
 }
 
+/** Factories for [[LinkedList]].
+  * 
+  * @since 0.2.0
+  */
 object LinkedList extends StrictOptimizedSeqFactory[LinkedList] {
 	
 	override def from[A] (coll: collection.IterableOnce[A]): LinkedList[A] =
