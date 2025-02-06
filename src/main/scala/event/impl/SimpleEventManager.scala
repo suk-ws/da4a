@@ -1,5 +1,7 @@
 package cc.sukazyo.std
-package event
+package event.impl
+
+import cc.sukazyo.std.event.AbstractEvent
 
 import scala.collection.mutable
 
@@ -10,11 +12,15 @@ import scala.collection.mutable
   *           passed to the listeners.
   * @tparam R The return type that can/should be returned by the event listener.
   */
-trait Event [T, R] {
+class SimpleEventManager [T, R]
+extends AbstractEvent[T, R]{
 	
-	type X = Function[T, R]
+	private val _listeners: mutable.Map[Object, MyCallback] = mutable.HashMap.empty
 	
-	private val _listeners: mutable.Map[Object, X] = mutable.HashMap.empty
+	// todo docs
+	override def registerListener (listener: MyCallback): SimpleEventManager.this.type =
+		this.addListener(listener)
+		this
 	
 	/**
 	  * Setup a listener to this event. The listener will be called when the event is triggered.
@@ -33,7 +39,7 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def addListener (key: Object)(func: X): Unit =
+	def addListener (key: Object)(func: MyCallback): Unit =
 		_listeners += (key, func)
 	
 	/**
@@ -49,7 +55,7 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def addListener (func: X): Unit =
+	def addListener (func: MyCallback): Unit =
 		this.addListener(key = func)(func)
 	
 	/**
@@ -69,7 +75,7 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def += (it: (Object, X)): Unit =
+	def += (it: (Object, MyCallback)): Unit =
 		this.addListener(it._1)(it._2)
 	
 	/**
@@ -85,8 +91,13 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def += (func: X): Unit =
+	def += (func: MyCallback): Unit =
 		this.addListener(func)
+	
+	// todo docs
+	override def removeListener (listener: MyCallback): SimpleEventManager.this.type =
+		this.removeListener(listener)
+		this
 	
 	/**
 	  * Remove a listener by the key of the listener.
@@ -97,15 +108,15 @@ trait Event [T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def removeListener (obj: Object): Option[X] =
+	def removeListener (obj: Object): Option[MyCallback] =
 		_listeners.remove(obj)
 	
 	/**
 	  * A map, contains all the registered listeners.
 	  *
-	  * the map's key is a listener's key, and the value is the listener function.
+	  * The map's key is a listener's key, and the value is the listener function.
 	  */
-	def listeners: Map[Object, X] =
+	def listeners: Map[Object, MyCallback] =
 		_listeners.toMap
 	
 	/**
@@ -119,20 +130,24 @@ trait Event [T, R] {
 			.toList
 			.map(this.invoking(params)(_))
 	
-	private def invoking (params: T)(listener: X): R =
+	// todo docs
+	override def emit (eventParams: T): List[R] =
+		this.apply(eventParams)
+	
+	private def invoking (params: T)(listener: MyCallback): R =
 		listener.apply(params)
 	
 }
 
-object Event {
+object SimpleEventManager {
 	
-	def apply [T, R]: Event[T, R] =
-		new Event[T, R] {}
+	def apply [T, R]: SimpleEventManager[T, R] =
+		new SimpleEventManager[T, R] {}
 	
-	def simple [T]: Event[T, Unit] =
-		new Event[T, Unit] {}
+	def simple [T]: SimpleEventManager[T, Unit] =
+		new SimpleEventManager[T, Unit] {}
 	
-	def basic: Event[Unit, Unit] =
-		new Event[Unit, Unit] {}
+	def basic: SimpleEventManager[Unit, Unit] =
+		new SimpleEventManager[Unit, Unit] {}
 	
 }
