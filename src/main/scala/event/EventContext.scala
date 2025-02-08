@@ -2,6 +2,7 @@ package cc.sukazyo.std
 package event
 
 import contexts.GivenContext
+import datetime.DateTimeTypeAliases.EpochMillis
 import stacks.WithCurrentStack
 
 import scala.collection.mutable
@@ -22,11 +23,6 @@ trait EventContext [EP] {
 	  * @since 0.2.0
 	  */
 	val params: EP
-	
-	/** todo: move
-	  * @since 0.2.0
-	  */
-	type EpochMillis = Long
 	
 	/** todo: docs
 	  * @since 0.2.0
