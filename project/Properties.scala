@@ -17,21 +17,21 @@ object Properties {
 		
 		"cc.sukazyo" % "resource-tools" % "0.3.0" % Test,
 		
-		"org.scalatest" %% "scalatest"          % "3.2.18" % Test,
-		"org.scalatest" %% "scalatest-freespec" % "3.2.18" % Test,
+		"org.scalatest" %% "scalatest"          % "3.2.19" % Test,
+		"org.scalatest" %% "scalatest-freespec" % "3.2.19" % Test,
 		// for test report
 		"com.vladsch.flexmark" % "flexmark"                 % "0.64.8" % Test,
 		"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test,
 		
-		"org.junit.jupiter"  % "junit-jupiter"           % "5.10.2" % Test,
-		"org.junit.platform" % "junit-platform-commons"  % "1.10.2" % Test,
-		"org.junit.platform" % "junit-platform-launcher" % "1.10.2" % Test,
-		"org.junit.platform" % "junit-platform-console"  % "1.10.2" % Test,
+		"org.junit.jupiter"  % "junit-jupiter"           % "5.11.4" % Test,
+		"org.junit.platform" % "junit-platform-commons"  % "1.11.4" % Test,
+		"org.junit.platform" % "junit-platform-launcher" % "1.11.4" % Test,
+		"org.junit.platform" % "junit-platform-console"  % "1.11.4" % Test,
 		//		"org.junit.vintage"  % "junit-vintage-engine"    % "5.4.2"  % Test,
 		//		"net.aichler"        % "jupiter-interface"       % "0.11.1" % Test,
 		//		"org.assertj"        % "assertj-core"            % "3.25.3" % Test,
 		//		"com.novocode"       % "junit-interface"         % "0.11"   % Test,
-	
+		
 	)
 	
 	val publishTarget: String = "workshop"
