@@ -20,11 +20,23 @@ package event
   */
 trait AbstractRichEvent [EP, ER] extends AbstractEvent[EP, ER] {
 	
-	/** todo: docs
+	/** Type of the rich listener object in this event.
+	  *
+	  * A [[EventListener]] with the same [[EP]] and [[ER]] type params.
+	  *
+	  * This type of listener should be able to be registered to this event using
+	  * [[registerListener(MyListener)]] method.
+	  *
 	  * @since 0.2.0
 	  */
 	type MyListener = EventListener[EP, ER]
-	/** todo: docs
+	
+	/** Type of the rich listener's callback in this event.
+	  * 
+	  * A [[EventListener.RichCallback]] with the same [[EP]] and [[ER]] type params.
+	  * 
+	  * In the [[RichEventOps]] trait, there are some methods can register this type of callback.
+	  * 
 	  * @since 0.2.0
 	  */
 	type MyRichCallback = EventListener.RichCallback[EP, ER]

@@ -33,7 +33,12 @@ package event
   */
 trait AbstractEvent [EP, ER] {
 	
-	/** todo: docs
+	/** Type of the most basic listener in this event.
+	  * 
+	  * Receives the event parameters [[EP]] and return the event result [[ER]].
+	  * 
+	  * This types listener can be registered to the event using [[registerListener]] method.
+	  * 
 	  * @since 0.2.0
 	  */
 	type MyCallback = EP => ER
