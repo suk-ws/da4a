@@ -1,7 +1,7 @@
 package cc.sukazyo.std
 package event.impl
 
-import cc.sukazyo.std.event.AbstractEvent
+import event.AbstractEvent
 
 import scala.collection.mutable
 

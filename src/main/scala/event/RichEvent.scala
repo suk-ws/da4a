@@ -1,7 +1,5 @@
 package cc.sukazyo.std
-package event.impl
-
-import event.{AbstractEvent, AbstractRichEvent, RichEvent, RichEventManagerOps, RichEventOps}
+package event
 
 /** todo: docs
   * @since 0.2.0
@@ -19,10 +17,7 @@ import event.{AbstractEvent, AbstractRichEvent, RichEvent, RichEventManagerOps, 
   *            For most cases that you don't need listeners to return something, the return
   *            type can be [[Unit]].
   */
-class NormalEventManager [EP, ER]
-	extends EventManager [EP, ER]
-		with RichEvent[EP, ER]
-		with AbstractEvent[EP, ER]
+trait RichEvent [EP, ER]
+	extends AbstractEvent[EP, ER]
 		with AbstractRichEvent[EP, ER]
 		with RichEventOps[EP, ER]
-		with RichEventManagerOps[EP, ER]

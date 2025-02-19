@@ -28,7 +28,7 @@ import scala.collection.mutable
   *            By receiving the EventContext, all the listeners are able to access to the
   *            parameters.
   */
-trait EventContext [EP] {
+trait EventContext [+EP] {
 	
 	/** Parameters of this event, provided by the event emitter.
 	  *
