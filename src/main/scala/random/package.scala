@@ -33,34 +33,40 @@ package object random {
 		if (possibility chance_is true) IfInChanceResult[Return](Some(cbk))
 		else IfInChanceResult[Return](None)
 	
-	class ArrayChooser [T] (array: Seq[T]) {
+	def chooseOne [T] (array: Seq[T])(using generator: RandomIntGenerator): T = {
+		if (array.isEmpty) throw IllegalArgumentException("The array that want to choose from must not empty!")
+		array(generator.nextInt(array.length))
+	}
+	
+	def choose [T] (array: Seq[T], count: Int)(using generator: RandomIntGenerator): List[T] = {
 		
-		def chooseOne (using generator: RandomIntGenerator): T = {
-			if (array.isEmpty) throw IllegalArgumentException("The array that want to choose from must not empty!")
-			array(generator.nextInt(array.length))
+		if (array.length < count) throw IllegalArgumentException("Array does not contains enough number of items to choose!")
+		
+		val indexes = Array.fill(array.length)(false)
+		var chosen = 0
+		while (chosen < count) {
+			val chosenIndex = generator.nextInt(array.length)
+			if (!indexes(chosenIndex))
+				indexes(chosenIndex) = true
+				chosen += 1
 		}
 		
-		def choose (n: Int)(using generator: RandomIntGenerator): List[T] = {
-			
-			if (array.length < n) throw IllegalArgumentException("Array does not contains enough number of items to choose!")
-			
-			val indexes = Array.fill(array.length)(false)
-			var chosen = 0
-			while (chosen < n) {
-				val chosenIndex = generator.nextInt(array.length)
-				if (!indexes(chosenIndex))
-					indexes(chosenIndex) = true
-					chosen += 1
-			}
-			
-			val result = ListBuffer.empty[T]
-			for (i <- indexes.indices) {
-				if (indexes(i)) result += array(i)
-			}
-			
-			result.toList
-			
+		val result = ListBuffer.empty[T]
+		for (i <- indexes.indices) {
+			if (indexes(i)) result += array(i)
 		}
+		
+		result.toList
+		
+	}
+	
+	implicit class CollectionChooser_SeqExtension [T, C[_] <: Seq[T]] (array: C[T]) {
+		
+		def chooseOne (using RandomIntGenerator): T =
+			random.chooseOne(array)
+		
+		def choose (count: Int)(using generator: RandomIntGenerator): List[T] =
+			random.choose(array, count)
 		
 	}
 	
