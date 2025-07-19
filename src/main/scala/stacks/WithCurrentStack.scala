@@ -99,14 +99,12 @@ object WithCurrentStack {
 	  */
 	@throws[SecurityException]
 	@throws[EmptyStackException]
-	def getStackHeadBeforeClass (clazz: Class[?]): StackTraceElement = {
-		boundary {
-			for (stack <- getStackTrace) {
-				if (!stack.getClassName.asInstanceOf[String].startsWith(clazz.getName))
-					break(stack)
-			}
-			throw EmptyStackException()
+	def getStackHeadBeforeClass (clazz: Class[?]): StackTraceElement = boundary {
+		for (stack <- getStackTrace) {
+			if (!stack.getClassName.nn.startsWith(clazz.getName))
+				break(stack)
 		}
+		throw EmptyStackException()
 	}
 	
 }
