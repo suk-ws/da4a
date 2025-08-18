@@ -2,7 +2,7 @@ package cc.sukazyo.std
 package event.impl
 
 import data.collections.LinkedList
-import event.{AbstractEvent, AbstractRichEvent, EventContext, EventListener, RichEvent, RichEventManagerOps, RichEventOps}
+import event.{AbstractEvent, AbstractRichEvent, EventContext, EventListener, EventOps, RichEvent, RichEventManagerOps, RichEventOps}
 
 import scala.collection.mutable
 import scala.util.boundary
@@ -26,6 +26,7 @@ import scala.util.boundary.break
 trait EventManager [EP, ER]
 	extends RichEvent[EP, ER]
 		with AbstractEvent[EP, ER]
+		with EventOps[EP, ER]
 		with AbstractRichEvent[EP, ER]
 		with RichEventOps[EP, ER]
 		with RichEventManagerOps[EP, ER] {

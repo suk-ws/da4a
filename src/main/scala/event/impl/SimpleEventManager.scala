@@ -1,7 +1,7 @@
 package cc.sukazyo.std
 package event.impl
 
-import event.AbstractEvent
+import event.{AbstractEvent, EventOps}
 
 import scala.collection.mutable
 
@@ -13,7 +13,8 @@ import scala.collection.mutable
   * @tparam R The return type that can/should be returned by the event listener.
   */
 class SimpleEventManager [T, R]
-extends AbstractEvent[T, R]{
+extends AbstractEvent[T, R]
+	with EventOps[T, R] {
 	
 	private val _listeners: mutable.Map[Object, MyCallback] = mutable.HashMap.empty
 	

@@ -1,7 +1,7 @@
 package cc.sukazyo.std
 package event.impl
 
-import event.{AbstractEvent, AbstractRichEvent, RichEvent, RichEventManagerOps, RichEventOps}
+import event.{AbstractEvent, AbstractRichEvent, EventOps, RichEvent, RichEventManagerOps, RichEventOps}
 
 /** todo: docs
   * @since 0.2.0
@@ -21,8 +21,9 @@ import event.{AbstractEvent, AbstractRichEvent, RichEvent, RichEventManagerOps, 
   */
 class NormalEventManager [EP, ER]
 	extends EventManager [EP, ER]
-		with RichEvent[EP, ER]
 		with AbstractEvent[EP, ER]
+		with EventOps[EP, ER]
 		with AbstractRichEvent[EP, ER]
+		with RichEvent[EP, ER]
 		with RichEventOps[EP, ER]
 		with RichEventManagerOps[EP, ER]

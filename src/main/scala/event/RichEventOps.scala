@@ -19,10 +19,15 @@ package event
   */
 trait RichEventOps [EP, ER] 
 	extends AbstractRichEvent[EP, ER] 
-		with AbstractEvent[EP, ER] {
+		with AbstractEvent[EP, ER]
+		with EventOps[EP, ER] {
 	
 	override def registerListener (listener: MyCallback): RichEventOps.this.type = {
 		this.registerListener(EventListener.simple[EP, ER](listener))
+	}
+	
+	def --> (listener: MyListener): RichEventOps.this.type = {
+		this.registerListener(listener)
 	}
 	
 	/** todo: docs
@@ -34,6 +39,21 @@ trait RichEventOps [EP, ER]
 	  */
 	def registerListener (priority: Int)(listener: MyCallback): RichEventOps.this.type = {
 		this.registerListener(EventListener.simple[EP, ER](listener, priority))
+	}
+	
+	/** todo: docs
+	 *
+	 * @since 0.2.0
+	 * @param priority
+	 * @param listener
+	 * @return
+	 */
+	def registerRichListener (listener: MyRichCallback): RichEventOps.this.type = {
+		this.registerListener(EventListener(listener))
+	}
+	
+	def ==> (listener: MyRichCallback): RichEventOps.this.type = {
+		this.registerRichListener(listener)
 	}
 	
 	/** todo: docs

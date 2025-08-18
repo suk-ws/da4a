@@ -16,7 +16,7 @@ package event
   * @tparam ER The event result's type.
   *            And also the return type of the listener's callback method.
   */
-trait EventListener [EP, ER] {
+trait EventListener [-EP, +ER] {
 	
 	/** todo: docs
 	  * @since 0.2.0
