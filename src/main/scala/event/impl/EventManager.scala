@@ -2,7 +2,7 @@ package cc.sukazyo.std
 package event.impl
 
 import data.collections.LinkedList
-import event.{AbstractEvent, AbstractRichEvent, EventContext, EventListener, EventOps, RichEvent, RichEventManagerOps, RichEventOps}
+import event.{EventContext, EventListener, ManageableEvent, RichEvent}
 
 import scala.collection.mutable
 import scala.util.boundary
@@ -23,13 +23,8 @@ import scala.util.boundary.break
   *            For most cases that you don't need listeners to return something, the return
   *            type can be [[Unit]].
   */
-trait EventManager [EP, ER]
-	extends RichEvent[EP, ER]
-		with AbstractEvent[EP, ER]
-		with EventOps[EP, ER]
-		with AbstractRichEvent[EP, ER]
-		with RichEventOps[EP, ER]
-		with RichEventManagerOps[EP, ER] {
+trait EventManager [EP, ER] extends RichEvent[EP, ER]
+	with ManageableEvent[EP, ER] {
 	
 	type MyListener = EventListener[EP, ER]
 	

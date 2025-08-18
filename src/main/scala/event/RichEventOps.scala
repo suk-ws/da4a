@@ -20,7 +20,7 @@ package event
 trait RichEventOps [EP, ER] 
 	extends AbstractRichEvent[EP, ER] 
 		with AbstractEvent[EP, ER]
-		with EventOps[EP, ER] {
+		with SimpleEventOps[EP, ER] {
 	
 	override def registerListener (listener: MyCallback): RichEventOps.this.type = {
 		this.registerListener(EventListener.simple[EP, ER](listener))

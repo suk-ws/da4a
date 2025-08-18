@@ -19,6 +19,6 @@ package event
   */
 trait RichEvent [EP, ER]
 	extends AbstractEvent[EP, ER]
-		with EventOps[EP, ER]
+		with SimpleEventOps[EP, ER]
 		with AbstractRichEvent[EP, ER]
 		with RichEventOps[EP, ER]

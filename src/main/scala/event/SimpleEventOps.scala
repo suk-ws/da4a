@@ -1,10 +1,10 @@
 package cc.sukazyo.std
 package event
 
-trait EventOps [EP, ER]
+trait SimpleEventOps [EP, ER]
 	extends AbstractEvent[EP, ER] {
 	
-	def --> (listener: this.MyCallback): EventOps.this.type =
+	def --> (listener: this.MyCallback): SimpleEventOps.this.type =
 		this.registerListener(listener)
 	
 }
