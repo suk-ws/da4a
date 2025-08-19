@@ -83,10 +83,13 @@ trait AbstractEvent [EP, ER] {
 	  * [[emit]] caller.
 	  * 
 	  * @since 0.2.0
+	 *  
+	 *  @deprecated use [[foreachListeners]] and [[cc.sukazyo.std.event.emitter.Emitter]] instead.
 	  *
 	  * @param eventParams The event parameters [[EP]]. Will be passed to all the listeners.
 	  * @return A list of the event results [[ER]]. Contains every listener's return value.
 	  */
+	@deprecated("use foreachListener instead", "da4a 0.2.0")
 	def emit (eventParams: EP): List[ER]
 	
 }

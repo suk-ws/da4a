@@ -23,7 +23,7 @@ trait ManageableEventOps [EP, ER] extends AbstractManageableEvent[EP, ER] {
 	/** todo: docs
 	  * @since 0.2.0
 	  */
-	protected var contextInitializeOperation: Option[ContextInitializeOperator] = None
+	private var contextInitializeOperation: Option[ContextInitializeOperator] = None
 	
 	@throws[ContextInitializerAlreadyDefinedException]
 	override def initContextWith (callback: ContextInitializeOperator): ManageableEventOps.this.type = {
@@ -33,10 +33,16 @@ trait ManageableEventOps [EP, ER] extends AbstractManageableEvent[EP, ER] {
 		this
 	}
 	
+	override protected[event] def patchContext (context: EventContext[EP]): Unit =
+		this.contextInitializeOperation match
+			case Some(contextInitializer) =>
+				contextInitializer(context)
+			case None =>
+	
 	/** todo: docs
 	  * @since 0.2.0
 	  */
-	protected var errorHandler: Option[EventListenerErrorHandler] = None
+	private var errorHandler: Option[EventListenerErrorHandler] = None
 	
 	@throws[ErrorHandlerAlreadyDefinedException]
 	override def initErrorHandlerWith (callback: EventListenerErrorHandler): ManageableEventOps.this.type = {
@@ -45,5 +51,8 @@ trait ManageableEventOps [EP, ER] extends AbstractManageableEvent[EP, ER] {
 		errorHandler = Some(callback)
 		this
 	}
+	
+	override protected[event] def getErrorHandler =
+		errorHandler
 	
 }

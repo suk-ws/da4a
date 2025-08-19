@@ -2,11 +2,8 @@ package cc.sukazyo.std
 package event.impl
 
 import data.collections.LinkedList
-import event.{EventContext, EventListener, ManageableEvent, RichEvent}
-
-import scala.collection.mutable
-import scala.util.boundary
-import scala.util.boundary.break
+import event.emitter.Emitter
+import event.{EventListener, ManageableEvent, RichEvent}
 
 /** todo: docs
   *
@@ -41,28 +38,12 @@ trait EventManager [EP, ER] extends RichEvent[EP, ER]
 		this
 	}
 	
+	override def foreachListeners[T] (cb: MyListener => T): List[T] = {
+		listeners.toList
+			.map(x => cb(x))
+	}
+	
 	override def emit (eventParams: EP): List[ER] =
-		val returns = mutable.ListBuffer.empty[ER]
-		implicit val context: EventContext[EP] = EventContext(eventParams)
-		// initialize the context. provided by [[RichEventManagerOps]]
-		if (this.contextInitializeOperation.isDefined)
-			this.contextInitializeOperation.get.apply(context)
-		// call all the listeners in order.
-		boundary { listeners.foreach { listener =>
-			try {
-				if (!listener.isSkipEvent)
-					val cr = listener.callback(context)
-					returns += cr
-			} catch case e: Throwable => {
-				// if the error handler is defined, then call error handler
-				//  and on that returns 'false', end the loop.
-				// if no error handler, just throw it out.
-				if (this.errorHandler.isDefined)
-					if (!this.errorHandler.get.apply(e, context))
-						break()
-				else throw e
-			}
-		}}
-		returns.toList
+		Emitter.emittingFor(this).emit(eventParams)
 	
 }

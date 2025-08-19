@@ -6,6 +6,7 @@ import event.impl.SimpleEventManager
 trait SimpleEvent[EP, ER]
 	extends AbstractEvent[EP, ER]
 		with SimpleEventOps[EP, ER]
+		with SimpleEmittableEvent[EP, ER]
 
 object SimpleEvent {
 	

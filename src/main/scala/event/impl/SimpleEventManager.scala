@@ -2,6 +2,7 @@ package cc.sukazyo.std
 package event.impl
 
 import event.SimpleEvent
+import event.emitter.Emitter
 
 import scala.collection.mutable
 
@@ -18,7 +19,7 @@ class SimpleEventManager [T, R] extends SimpleEvent[T, R] {
 	
 	// todo docs
 	override def registerListener (listener: MyCallback): SimpleEventManager.this.type =
-		this.addListener(listener)
+		this.addListener(listener, listener)
 		this
 	
 	/**
@@ -38,60 +39,8 @@ class SimpleEventManager [T, R] extends SimpleEvent[T, R] {
 	  *
 	  * @since 0.2.0
 	  */
-	def addListener (key: Object)(func: MyCallback): Unit =
-		_listeners += (key, func)
-	
-	/**
-	  * Setup a listener to this event.
-	  *
-	  * @param func A function that will be called when the event is triggered. aka the listener
-	  *             of this event.
-	  *
-	  *             Also this function itself will be the key of this listener,  means you can
-	  *             remove this listener later using <code>[[removeListener]](func)</code>.
-	  *
-	  * @see [[addListener(Object)(Func)]]
-	  *
-	  * @since 0.2.0
-	  */
-	def addListener (func: MyCallback): Unit =
-		this.addListener(key = func)(func)
-	
-	/**
-	  * Setup a listener to this event. The listener will be called when the event is triggered.
-	  *
-	  * @param key  The key of this listener.
-	  *
-	  *             If another listener with the same key is already added, then that one will
-	  *             be automatically removed when this new listener is added.
-	  *
-	  *             You can also remove this listener later using <code>[[removeListener]](key)</code>
-	  * @param func A function, will be called when the event is triggered. aka the listener of
-	  *             this event.
-	  *
-	  *             Based on the differences usage, the event might be triggered multi times and
-	  *             this listener will be called multi times also.
-	  *
-	  * @since 0.2.0
-	  */
-	def += (it: (Object, MyCallback)): Unit =
-		this.addListener(it._1)(it._2)
-	
-	/**
-	  * Setup a listener to this event.
-	  *
-	  * @param func A function that will be called when the event is triggered. aka the listener
-	  *             of this event.
-	  *
-	  *             Also this function itself will be the key of this listener,  means you can
-	  *             remove this listener later using <code>[[removeListener]](func)</code>.
-	  *
-	  * @see [[addListener(Object)(Func)]]
-	  *
-	  * @since 0.2.0
-	  */
-	def += (func: MyCallback): Unit =
-		this.addListener(func)
+	private def addListener (key: Object, func: MyCallback): Unit =
+		_listeners += (key -> func)
 	
 	// todo docs
 	override def removeListener (listener: MyCallback): SimpleEventManager.this.type =
@@ -118,23 +67,15 @@ class SimpleEventManager [T, R] extends SimpleEvent[T, R] {
 	def listeners: Map[Object, MyCallback] =
 		_listeners.toMap
 	
-	/**
-	  * Triggers this listener.
-	  *
-	  * @param params The parameters of this event, also will be passed to the listener.
-	  * @return A list contains the process results of the listeners.
-	  */
-	def apply (params: T): List[R] =
+	override def foreachListeners[T] (cb: MyCallback => T): List[T] = {
 		_listeners.values
 			.toList
-			.map(this.invoking(params)(_))
+			.map(x => cb(x))
+	}
 	
 	// todo docs
 	override def emit (eventParams: T): List[R] =
-		this.apply(eventParams)
-	
-	private def invoking (params: T)(listener: MyCallback): R =
-		listener.apply(params)
+		Emitter.emittingFor(this).emit(eventParams)
 	
 }
 
