@@ -8,10 +8,10 @@ trait Emitter [EP, ER, EV <: AbstractEvent[EP, ER]] {
 	
 	def emit (params: EP): List[ER]
 	
-	def patchContext (event: AbstractManageableEvent[EP, ER], context: EventContext[EP]): Unit =
+	protected def patchContext (event: AbstractManageableEvent[EP, ER], context: EventContext[EP]): Unit =
 		event.patchContext(context)
 	
-	def getErrorHandler (event: AbstractManageableEvent[EP, ER]): Option[event.EventListenerErrorHandler] =
+	protected def getErrorHandler (event: AbstractManageableEvent[EP, ER]): Option[event.EventListenerErrorHandler] =
 		event.getErrorHandler
 	
 }

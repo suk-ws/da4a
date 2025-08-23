@@ -83,6 +83,16 @@ object DateTimeTypeAliases {
 		  */
 		infix def fromSeconds (epochSeconds: EpochSeconds): EpochMillis =
 			epochSeconds.longValue * 1000L
+		
+		/** Convert from [[EpochSeconds]].
+		 *
+		 * Due to the missing accuracy, the converted EpochMillis will
+		 * be always in 00:00:00.000 UTC aligned.
+		 *
+		 * @since 0.2.0
+		 */
+		infix def fromDays (epochDays: EpochDays): EpochMillis =
+			epochDays.longValue * (1000 * 60 * 60 * 24)
 	
 	/** The UNIX Epoch Time in seconds.
 	  *
@@ -96,6 +106,24 @@ object DateTimeTypeAliases {
 	  * @since 0.2.0
 	  */
 	type EpochSeconds = Int
+	
+	/** Utilities for [[EpochSeconds]], converts between different time formats.
+	 *
+	 * @since 0.2.0
+	 */
+	object EpochSeconds:
+		/** Convert from [[EpochMillis]].
+		  *
+		  * The time is floored to seconds. Means that 00:00:00.999 will be converted to
+		  * 00:00:00 instead of 00:00:01.
+		  *
+		  * If the [[EpochMillis]] is later than 2038-01-19 03:14:07. Then the number will
+		  * overflow to 1901-12-13 20:45:52 UTC.
+		  *
+		  * @since 0.2.0
+		  */
+		infix def fromMillis (epochMillis: EpochMillis): EpochSeconds =
+			(epochMillis / 1000).toInt
 	
 	/** The UNIX Epoch Time in day.
 	  *
