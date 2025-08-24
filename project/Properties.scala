@@ -10,7 +10,7 @@ object Properties {
 	// Indicates if this project is under SNAPSHOT version.
 	//  If so, the publisher will publish to the snapshot repository,
 	//  and the version name will follow maven's snapshot versioning standard.
-	val SNAPSHOT: Boolean = true
+	val SNAPSHOT: Boolean = false
 	
 	val dependencyRepos: Seq[Resolver] = Seq(
 		Resolvers.ws_release
@@ -26,10 +26,10 @@ object Properties {
 		"com.vladsch.flexmark" % "flexmark"                 % "0.64.8" % Test,
 		"com.vladsch.flexmark" % "flexmark-profile-pegdown" % "0.64.8" % Test,
 		
-		"org.junit.jupiter"  % "junit-jupiter"           % "5.13.3" % Test,
-		"org.junit.platform" % "junit-platform-commons"  % "1.13.3" % Test,
-		"org.junit.platform" % "junit-platform-launcher" % "1.13.3" % Test,
-		"org.junit.platform" % "junit-platform-console"  % "1.13.3" % Test,
+		"org.junit.jupiter"  % "junit-jupiter"           % "5.13.4" % Test,
+		"org.junit.platform" % "junit-platform-commons"  % "1.13.4" % Test,
+		"org.junit.platform" % "junit-platform-launcher" % "1.13.4" % Test,
+		"org.junit.platform" % "junit-platform-console"  % "1.13.4" % Test,
 		//		"org.junit.vintage"  % "junit-vintage-engine"    % "5.4.2"  % Test,
 		//		"net.aichler"        % "jupiter-interface"       % "0.11.1" % Test,
 		//		"org.assertj"        % "assertj-core"            % "3.25.3" % Test,
