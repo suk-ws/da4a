@@ -36,16 +36,31 @@ code used in multiple projects.
 
 Current features:
 
+- Full-featured `event.Event` library, supports ordering listeners by
+  listener priority, `EventContext` that can pass variables between
+  listeners and handle event success status, event/emitter's error
+  handler to handle errors from listener thrown.
+- Extended data types
+  - `LinkedList` from Java, can quickly sort inplace and iterates.
+- Scala DSLs provide a way to do more simple jobs easier
+  - some commonly used math operator (`/-/`(over), `*^`(pow)).
+  - extension methods to encapsulate values to scala base data types.
+- GivenContext -— put(provide) and get(use) variables using its type as
+    the key
+- Series random utils
+  - x/y chances to:
+  - get a boolean value, or get one or another value.
+  - choose one or more items from a list.
+  - run a code block, or run another code block.
 - Bytes data processing
   - Convert a singed byte (or a byte array) to a HEX string
-- Scala DSLs provide a way to do more simple jobs easier
-  - some commonly used math operator (`/-/`(over), `*^`(pow))
-  - extension methods to encapsulate values to scala base data types
-- Library Tools
-  - GivenContext -— put(provide) and get(use) variables using its type as
-    the key
-- Series random utils (currently only weighted boolean)
-- Numeric Statistics from the Morny project.
+- Alias for long based datetime, or int based datetime, and the
+  conversion functions.
+- Drop specific `Class[T]` from one stack trace, or get a stack trace from
+  where calls the function.
+- Convert an `Exception`(`Throwable`) to String with various formatting
+  methods.
+- ~~Numeric Statistics from the Morny project. (unstable)~~
 
 Scheduled features:
 
