@@ -367,6 +367,24 @@ class GivenContext private (
 	infix def >!> [T] (t: Class[T]): T =
 		this.getUnsafe(t)
 	
+	def discard [T] (clazz: Class[T]): Boolean = ???
+	def discard [T: ClassTag]: Boolean = this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	
+	def pop [T] (clazz: Class[T]): CxtOption[T] = ???
+	def pop [T: ClassTag]: CxtOption[T] = this.pop(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	infix def !>> [T] (clazz: Class[T]): CxtOption[T] = pop(clazz)
+	
+	def popOrNull [T] (clazz: Class[T]): T | Null = ???
+	def popOrNull [T: ClassTag]: T | Null = this.popOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	infix def !>?> [T] (clazz: Class[T]): T | Null = this.popOrNull(clazz)
+	
+	@throws[ContextNotGivenException]
+	def popUnsafe [T] (clazz: Class[T]): T = ???
+	@throws[ContextNotGivenException]
+	def popUnsafe [T: ClassTag]: T = this.popUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	@throws[ContextNotGivenException]
+	infix def !>!> [T] (clazz: Class[T]): T = this.popUnsafe(clazz)
+	
 	/// #block use
 	///   directly use one by consumer
 	/** @since 0.2.0 */
@@ -380,6 +398,7 @@ class GivenContext private (
 	/** @since 0.1.0 */
 	infix def >> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 		this.use[T,U](consumer)
+	
 	/** @since 0.2.0 */
 	def consume [T] (clazz: Class[T])(consumer: T => Any): ConsumeResult[Any] = // TODO: docs and tests
 		this.use[T,Any](clazz)(consumer)
@@ -389,6 +408,10 @@ class GivenContext private (
 	/** @since 0.2.0 */
 	def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] = // TODO: docs and tests
 		this.use[T,Unit](clazz)(jConsumer.asScala)
+	
+	def take [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = ???
+	def take [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
+	infix def !>> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(consumer)
 	
 	/** Get the [[OwnedContext]] connects to the owner class given.
 	  *
@@ -534,6 +557,24 @@ class GivenContext private (
 		infix def >!>[T] (t: Class[T]): T =
 			this.getUnsafe(t)
 		
+		def discard[T] (clazz: Class[T]): Boolean = ???
+		def discard[T: ClassTag]: Boolean = this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		
+		def pop[T] (clazz: Class[T]): CxtOption[T] = ???
+		def pop[T: ClassTag]: CxtOption[T] = this.pop(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		infix def !>>[T] (clazz: Class[T]): CxtOption[T] = pop(clazz)
+		
+		def popOrNull[T] (clazz: Class[T]): T | Null = ???
+		def popOrNull[T: ClassTag]: T | Null = this.popOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		infix def !>?>[T] (clazz: Class[T]): T | Null = this.popOrNull(clazz)
+		
+		@throws[ContextNotGivenException]
+		def popUnsafe[T] (clazz: Class[T]): T = ???
+		@throws[ContextNotGivenException]
+		def popUnsafe[T: ClassTag]: T = this.popUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		@throws[ContextNotGivenException]
+		infix def !>!>[T] (clazz: Class[T]): T = this.popUnsafe(clazz)
+		
 		/** @since 0.2.0 */
 		def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = // TODO: tests
 			this.get(clazz) match
@@ -545,6 +586,7 @@ class GivenContext private (
 		/** @since 0.1.0 */
 		infix def >> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 			this.use[T,U](consumer)
+		
 		/** @since 0.2.0 */
 		def consume [T] (clazz: Class[T])(consumer: T => Any): ConsumeResult[Any] = // TODO: tests
 			this.use[T,Any](clazz)(consumer)
@@ -554,6 +596,10 @@ class GivenContext private (
 		/** @since 0.2.0 */
 		def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] = // TODO: tests
 			this.use[T,Unit](clazz)(jConsumer.asScala)
+		
+		def take[T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = ???
+		def take[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
+		infix def !>>[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(consumer)
 		
 	}
 	
