@@ -115,7 +115,7 @@ object GivenContext {
 class GivenContext private (
 	private val variables: ImplicitsMap[Any],
 	private val variablesWithOwner: ImplicitsMap[ImplicitsMap[Any]]
-) extends mutable.Cloneable[GivenContext] {
+) extends AbstractGivenContext with mutable.Cloneable[GivenContext] {
 	
 	given GivenContext = this
 	
@@ -434,7 +434,7 @@ class GivenContext private (
 	  *
 	  * @since 0.1.0
 	  */
-	class OwnedContext (thisClazz: Class[?]) { // TODO: add java capability methods
+	class OwnedContext (thisClazz: Class[?]) extends AbstractGivenContextOwnedContext { // TODO: add java capability methods
 		private given folderClass: FolderClass = FolderClass(Some(thisClazz))
 		
 		private def getThisMap: Option[ImplicitsMap[Any]] =
@@ -571,7 +571,7 @@ class GivenContext private (
 	  *
 	  * @since 0.1.0
 	  */
-	trait ConsumeResult[U] {
+	trait ConsumeResult[U] extends AbstractConsumeResult[U] {
 		
 		/** Returns the result of the consumer function.
 		  *
