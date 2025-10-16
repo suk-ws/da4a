@@ -3,6 +3,23 @@ package contexts
 
 import contexts.GivenContext.ContextNotGivenException
 
+/** The result context of [[GivenContext.consuming]] operation.
+  *
+  * Gives a way to do the most useful following operation after the [[GivenContext.consuming]].
+  * Mostly depends on whether the consumer function executes successfully or not.
+  *
+  * Notice that once the consumer function is called, is seen as succeed . The exception
+  * throws in the original consumer function will be just throws to the caller, not
+  * handled by this context.
+  *
+  * *Note: Although this trait comes from v0.3.0 update, the implementation in GivenContext
+  * actually exists already in v0.1.0.
+  *
+  * @tparam U The type of the return value that should returns by [[GivenContext.consuming]]'s
+  *           consumer function.
+  *
+  * @since 0.3.0
+  */
 trait AbstractConsumeResult [U] {
 	
 	/** Returns the result of the consumer function.
