@@ -191,6 +191,24 @@ class GivenContext private (
 	infix def >!> [T] (t: Class[T]): T =
 		this.getUnsafe(t)
 	
+	def discard [T] (clazz: Class[T]): Boolean = ???
+	def discard [T: ClassTag]: Boolean = this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	
+	def pop [T] (clazz: Class[T]): CxtOption[T] = ???
+	def pop [T: ClassTag]: CxtOption[T] = this.pop(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	infix def !>> [T] (clazz: Class[T]): CxtOption[T] = pop(clazz)
+	
+	def popOrNull [T] (clazz: Class[T]): T | Null = ???
+	def popOrNull [T: ClassTag]: T | Null = this.popOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	infix def !>?> [T] (clazz: Class[T]): T | Null = this.popOrNull(clazz)
+	
+	@throws[ContextNotGivenException]
+	def popUnsafe [T] (clazz: Class[T]): T = ???
+	@throws[ContextNotGivenException]
+	def popUnsafe [T: ClassTag]: T = this.popUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	@throws[ContextNotGivenException]
+	infix def !>!> [T] (clazz: Class[T]): T = this.popUnsafe(clazz)
+	
 	def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] =
 		this.get[T](clazz) match
 			case Left(e) => ConsumeFailed[U](e)
@@ -205,6 +223,10 @@ class GivenContext private (
 		this.use[T,Any](consumer)
 	def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] =
 		this.use[T,Unit](clazz)(jConsumer.asScala)
+	
+	def take [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = ???
+	def take [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
+	infix def !>> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(consumer)
 	
 	def / (owner: Class[?]): OwnedContext =
 		OwnedContext(owner)
@@ -295,6 +317,25 @@ class GivenContext private (
 			this.getUnsafe(t)
 		
 		def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] =
+		def discard[T] (clazz: Class[T]): Boolean = ???
+		def discard[T: ClassTag]: Boolean = this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		
+		def pop[T] (clazz: Class[T]): CxtOption[T] = ???
+		def pop[T: ClassTag]: CxtOption[T] = this.pop(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		infix def !>>[T] (clazz: Class[T]): CxtOption[T] = pop(clazz)
+		
+		def popOrNull[T] (clazz: Class[T]): T | Null = ???
+		def popOrNull[T: ClassTag]: T | Null = this.popOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		infix def !>?>[T] (clazz: Class[T]): T | Null = this.popOrNull(clazz)
+		
+		@throws[ContextNotGivenException]
+		def popUnsafe[T] (clazz: Class[T]): T = ???
+		@throws[ContextNotGivenException]
+		def popUnsafe[T: ClassTag]: T = this.popUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		@throws[ContextNotGivenException]
+		infix def !>!>[T] (clazz: Class[T]): T = this.popUnsafe(clazz)
+		
+		def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = // TODO: tests
 			this.get(clazz) match
 				case Left(e) => ConsumeFailed[U](e)
 				case Right(i) => ConsumeSucceed[U](consumer(i))
@@ -308,6 +349,10 @@ class GivenContext private (
 			this.use[T,Any](consume)
 		def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] =
 			this.use[T,Unit](clazz)(jConsumer.asScala)
+		
+		def take[T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = ???
+		def take[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
+		infix def !>>[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(consumer)
 		
 	}
 	
