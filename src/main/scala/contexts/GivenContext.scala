@@ -190,23 +190,34 @@ class GivenContext private (
 	override infix def >!> [T] (t: Class[T]): T =
 		this.getUnsafe(t)
 	
-	override def discard [T] (clazz: Class[T]): Boolean = ???
-	override def discard [T: ClassTag]: Boolean = this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	override def discard [T] (clazz: Class[T]): Boolean =
+		this.pop(clazz).map(_=>true).getOrElse(false)
+	override def discard [T: ClassTag]: Boolean =
+		this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 	
-	override def pop [T] (clazz: Class[T]): CxtOption[T] = ???
-	override def pop [T: ClassTag]: CxtOption[T] = this.pop(classTag[T].runtimeClass.asInstanceOf[Class[T]])
-	override infix def !>> [T] (clazz: Class[T]): CxtOption[T] = pop(clazz)
+	override def pop [T] (clazz: Class[T]): CxtOption[T] =
+		this.get(clazz).map { value => this.variables.remove(clazz); value }
+	override def pop [T: ClassTag]: CxtOption[T] =
+		this.pop(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	override infix def !>> [T] (clazz: Class[T]): CxtOption[T] =
+		pop(clazz)
 	
-	override def popOrNull [T] (clazz: Class[T]): T | Null = ???
-	override def popOrNull [T: ClassTag]: T | Null = this.popOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
-	override infix def !>?> [T] (clazz: Class[T]): T | Null = this.popOrNull(clazz)
+	override def popOrNull [T] (clazz: Class[T]): T | Null =
+		this.pop(clazz).getOrElse(null)
+	override def popOrNull [T: ClassTag]: T | Null =
+		this.popOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	override infix def !>?> [T] (clazz: Class[T]): T | Null =
+		this.popOrNull(clazz)
 	
 	@throws[ContextNotGivenException]
-	override def popUnsafe [T] (clazz: Class[T]): T = ???
+	override def popUnsafe [T] (clazz: Class[T]): T =
+		this.pop(clazz).toTry.get
 	@throws[ContextNotGivenException]
-	override def popUnsafe [T: ClassTag]: T = this.popUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+	override def popUnsafe [T: ClassTag]: T =
+		this.popUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 	@throws[ContextNotGivenException]
-	override infix def !>!> [T] (clazz: Class[T]): T = this.popUnsafe(clazz)
+	override infix def !>!> [T] (clazz: Class[T]): T =
+		this.popUnsafe(clazz)
 	
 	override def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] =
 		this.get[T](clazz) match
@@ -223,9 +234,15 @@ class GivenContext private (
 	override def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] =
 		this.use[T,Unit](clazz)(jConsumer.asScala)
 	
-	override def take [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = ???
-	override def take [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
-	override infix def !>> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(consumer)
+	override def take [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] =
+		//noinspection DuplicatedCode
+		this.pop(clazz) match
+			case Left(e) => ConsumeFailed[U](e)
+			case Right(i) => ConsumeSucceed[U](consumer(i))
+	override def take [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
+		this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
+	override infix def !>> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
+		this.take(consumer)
 	
 	override def / (owner: Class[?]): OwnedContext =
 		OwnedContext(owner)
@@ -299,19 +316,31 @@ class GivenContext private (
 		override infix def >!>[T] (t: Class[T]): T =
 			this.getUnsafe(t)
 		
-		override def discard[T] (clazz: Class[T]): Boolean = ???
-		override def discard[T: ClassTag]: Boolean = this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
+		override def discard[T] (clazz: Class[T]): Boolean =
+			this.pop(clazz).map(_ => true).getOrElse(false)
+		override def discard[T: ClassTag]: Boolean =
+			this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 		
-		override def pop[T] (clazz: Class[T]): CxtOption[T] = ???
+		override def pop[T] (clazz: Class[T]): CxtOption[T] =
+			this.get(clazz).map { value =>
+				variablesWithOwner.get(thisClazz) match {
+					case None =>
+					case Some(varColl) =>
+						varColl.remove(clazz)
+				}
+				value
+			}
 		override def pop[T: ClassTag]: CxtOption[T] = this.pop(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 		override infix def !>>[T] (clazz: Class[T]): CxtOption[T] = pop(clazz)
 		
-		override def popOrNull[T] (clazz: Class[T]): T | Null = ???
+		override def popOrNull[T] (clazz: Class[T]): T | Null =
+			this.pop(clazz).getOrElse(null)
 		override def popOrNull[T: ClassTag]: T | Null = this.popOrNull(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 		override infix def !>?>[T] (clazz: Class[T]): T | Null = this.popOrNull(clazz)
 		
 		@throws[ContextNotGivenException]
-		override def popUnsafe[T] (clazz: Class[T]): T = ???
+		override def popUnsafe[T] (clazz: Class[T]): T =
+			this.pop(clazz).toTry.get
 		@throws[ContextNotGivenException]
 		override def popUnsafe[T: ClassTag]: T = this.popUnsafe(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 		@throws[ContextNotGivenException]
@@ -332,7 +361,11 @@ class GivenContext private (
 		override def consuming [T] (clazz: Class[T])(jConsumer: JConsumer[T]): ConsumeResult[Unit] =
 			this.use[T,Unit](clazz)(jConsumer.asScala)
 		
-		override def take[T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = ???
+		override def take[T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] =
+			//noinspection DuplicatedCode
+			this.pop(clazz) match
+				case Left(e) => ConsumeFailed[U](e)
+				case Right(i) => ConsumeSucceed[U](consumer(i))
 		override def take[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
 		override infix def !>>[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(consumer)
 		

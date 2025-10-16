@@ -7,6 +7,7 @@ import contexts.GivenContext.ContextNotGivenException
 import java.util.function.Consumer
 import scala.reflect.ClassTag
 
+/** @since 0.3.0 */
 trait AbstractGivenContextVariableOps
 	extends Helpers
 		with ProvideOps
@@ -16,14 +17,18 @@ trait AbstractGivenContextVariableOps
 		with PopOps
 		with TakeOps
 
+/** @since 0.3.0 */
 object AbstractGivenContextVariableOps extends Helpers {
 	
+	/** @since 0.3.0 */
 	trait Helpers {
 		
+		/** @since 0.3.0 */
 		type CxtOption[T] = Either[ContextNotGivenException, T]
 		
 	}
 	
+	/** @since 0.3.0 */
 	trait ProvideOps {
 		
 		/** @since 0.2.0 */
@@ -91,14 +96,18 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
+	/** @since 0.3.0 */
 	trait DiscardOps {
 		
+		/** @since 0.3.0 */
 		def discard [T] (clazz: Class[T]): Boolean
 		
+		/** @since 0.3.0 */
 		def discard [T: ClassTag]: Boolean
 		
 	}
 	
+	/** @since 0.3.0 */
 	trait GetOps {
 		
 		/** @since 0.1.0
@@ -145,6 +154,7 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
+	/** @since 0.3.0 */
 	trait UseOps {
 		
 		/** @since 0.2.0 */
@@ -167,29 +177,43 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
+	/** @since 0.3.0 */
 	trait PopOps {
 		
+		/** @since 0.3.0 */
 		def pop [T] (clazz: Class[T]): CxtOption[T]
+		/** @since 0.3.0 */
 		def pop [T: ClassTag]: CxtOption[T]
+		/** @since 0.3.0 */
 		infix def !>> [T] (clazz: Class[T]): CxtOption[T]
 		
+		/** @since 0.3.0 */
 		def popOrNull [T] (clazz: Class[T]): T | Null
+		/** @since 0.3.0 */
 		def popOrNull [T: ClassTag]: T | Null
+		/** @since 0.3.0 */
 		infix def !>?> [T] (clazz: Class[T]): T | Null
 		
+		/** @since 0.3.0 */
 		@throws[ContextNotGivenException]
 		def popUnsafe [T] (clazz: Class[T]): T
+		/** @since 0.3.0 */
 		@throws[ContextNotGivenException]
 		def popUnsafe [T: ClassTag]: T
+		/** @since 0.3.0 */
 		@throws[ContextNotGivenException]
 		infix def !>!> [T] (clazz: Class[T]): T
 		
 	}
 	
+	/** @since 0.3.0 */
 	trait TakeOps {
 		
+		/** @since 0.3.0 */
 		def take [T, U] (clazz: Class[T])(consumer: T => U): AbstractConsumeResult[U]
+		/** @since 0.3.0 */
 		def take [T: ClassTag, U] (consumer: T => U): AbstractConsumeResult[U]
+		/** @since 0.3.0 */
 		infix def !>> [T: ClassTag, U] (consumer: T => U): AbstractConsumeResult[U]
 		
 	}
