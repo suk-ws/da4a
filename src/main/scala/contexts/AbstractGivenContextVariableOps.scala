@@ -1,7 +1,7 @@
 package cc.sukazyo.std
 package contexts
 
-import contexts.AbstractGivenContextVariableOps.{GetOps, Helpers, ProvideOps, UseOps}
+import contexts.AbstractGivenContextVariableOps.*
 import contexts.GivenContext.ContextNotGivenException
 
 import java.util.function.Consumer
@@ -10,11 +10,11 @@ import scala.reflect.ClassTag
 trait AbstractGivenContextVariableOps
 	extends Helpers
 		with ProvideOps
-//		with DiscardOps
+		with DiscardOps
 		with GetOps
 		with UseOps
-//		with PopOps
-//		with TakeOps
+		with PopOps
+		with TakeOps
 
 object AbstractGivenContextVariableOps extends Helpers {
 	
@@ -91,7 +91,13 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
-//	trait DiscardOps {}
+	trait DiscardOps {
+		
+		def discard [T] (clazz: Class[T]): Boolean
+		
+		def discard [T: ClassTag]: Boolean
+		
+	}
 	
 	trait GetOps {
 		
@@ -161,8 +167,31 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
-//	trait PopOps {}
+	trait PopOps {
+		
+		def pop [T] (clazz: Class[T]): CxtOption[T]
+		def pop [T: ClassTag]: CxtOption[T]
+		infix def !>> [T] (clazz: Class[T]): CxtOption[T]
+		
+		def popOrNull [T] (clazz: Class[T]): T | Null
+		def popOrNull [T: ClassTag]: T | Null
+		infix def !>?> [T] (clazz: Class[T]): T | Null
+		
+		@throws[ContextNotGivenException]
+		def popUnsafe [T] (clazz: Class[T]): T
+		@throws[ContextNotGivenException]
+		def popUnsafe [T: ClassTag]: T
+		@throws[ContextNotGivenException]
+		infix def !>!> [T] (clazz: Class[T]): T
+		
+	}
 	
-//	trait TakeOps {}
+	trait TakeOps {
+		
+		def take [T, U] (clazz: Class[T])(consumer: T => U): AbstractConsumeResult[U]
+		def take [T: ClassTag, U] (consumer: T => U): AbstractConsumeResult[U]
+		infix def !>> [T: ClassTag, U] (consumer: T => U): AbstractConsumeResult[U]
+		
+	}
 	
 }

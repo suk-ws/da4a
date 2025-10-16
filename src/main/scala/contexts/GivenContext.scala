@@ -316,7 +316,6 @@ class GivenContext private (
 		infix def >!>[T] (t: Class[T]): T =
 			this.getUnsafe(t)
 		
-		def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] =
 		def discard[T] (clazz: Class[T]): Boolean = ???
 		def discard[T: ClassTag]: Boolean = this.discard(classTag[T].runtimeClass.asInstanceOf[Class[T]])
 		

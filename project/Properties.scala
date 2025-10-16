@@ -5,12 +5,12 @@ object Properties {
 	val package_name :String = "da4a"
 	val package_group: String = "cc.sukazyo"
 	val package_id: String = s"$package_group.std"
-	val version: String = "0.2.0"
+	val version: String = "0.3.0"
 	
 	// Indicates if this project is under SNAPSHOT version.
 	//  If so, the publisher will publish to the snapshot repository,
 	//  and the version name will follow maven's snapshot versioning standard.
-	val SNAPSHOT: Boolean = false
+	val SNAPSHOT: Boolean = true
 	
 	val dependencyRepos: Seq[Resolver] = Seq(
 		Resolvers.ws_release
