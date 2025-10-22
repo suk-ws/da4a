@@ -20,15 +20,36 @@ trait AbstractGivenContextVariableOps
 /** @since 0.3.0 */
 object AbstractGivenContextVariableOps extends Helpers {
 	
-	/** @since 0.3.0 */
+	/** Common things (mostly type aliases) that related to variable operation.
+	  * 
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
 	trait Helpers {
 		
-		/** @since 0.3.0 */
+		/** Either a [[ContextNotGivenException]] when trying to get an unexisting variable, or
+		  * the variable itself.
+		  *
+		  * Used in many `get` related method of [[GivenContext]].
+		  *
+		  * @since 0.3.0
+		  */
 		type CxtOption[T] = Either[ContextNotGivenException, T]
 		
 	}
 	
-	/** @since 0.3.0 */
+	/** The definition of methods that aims to provide/store/save a variable to
+	  * [[GivenContext]].
+	  * 
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  * 
+	  * @since 0.3.0
+	  */
 	trait ProvideOps {
 		
 		/** @since 0.2.0 */
@@ -96,7 +117,15 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
-	/** @since 0.3.0 */
+	/** The definition of methods that aims to remove/delete/discard/reset/clean a variable in
+	  * [[GivenContext]].
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
 	trait DiscardOps {
 		
 		/** @since 0.3.0 */
@@ -107,7 +136,14 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
-	/** @since 0.3.0 */
+	/** The definition of methods that aims to get a variable from [[GivenContext]].
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
 	trait GetOps {
 		
 		/** @since 0.1.0
@@ -154,7 +190,15 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
-	/** @since 0.3.0 */
+	/** The definition of methods that aims to get a variable from [[GivenContext]], in a
+	  * callback form.
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
 	trait UseOps {
 		
 		/** @since 0.2.0 */
@@ -177,7 +221,15 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
-	/** @since 0.3.0 */
+	/** The definition of methods that aims to do a [[GetOps get]] and
+	  * [[DiscardOps delete(discard)]] in the same time.
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
 	trait PopOps {
 		
 		/** @since 0.3.0 */
@@ -206,7 +258,14 @@ object AbstractGivenContextVariableOps extends Helpers {
 		
 	}
 	
-	/** @since 0.3.0 */
+	/** The definition of methods that aims to do [[PopOps]] in a callback form.
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
 	trait TakeOps {
 		
 		/** @since 0.3.0 */
