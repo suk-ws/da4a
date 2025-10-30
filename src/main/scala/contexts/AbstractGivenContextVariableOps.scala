@@ -10,15 +10,23 @@ import scala.reflect.ClassTag
 /** @since 0.3.0 */
 trait AbstractGivenContextVariableOps
 	extends Helpers
+		with ReadOnlyOps
 		with ProvideOps
 		with DiscardOps
-		with GetOps
-		with UseOps
 		with PopOps
 		with TakeOps
+		with AcceptOps
+		with DrainOps
 
 /** @since 0.3.0 */
 object AbstractGivenContextVariableOps extends Helpers {
+	
+	/** @since 0.3.0 */
+	trait ReadOnlyOps extends Helpers
+		with GetOps
+		with UseOps
+		with HasOps
+		with ContainsOps
 	
 	/** Common things (mostly type aliases) that related to variable operation.
 	  * 
@@ -274,6 +282,98 @@ object AbstractGivenContextVariableOps extends Helpers {
 		def take [T: ClassTag, U] (consumer: T => U): AbstractConsumeResult[U]
 		/** @since 0.3.0 */
 		infix def !>> [T: ClassTag, U] (consumer: T => U): AbstractConsumeResult[U]
+		
+	}
+	
+	/** The definition of methods that aims to check whether any variable with one type is
+	  * provided.
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
+	trait HasOps {
+		
+		/** @since 0.3.0 */
+		def has [T] (clazz: Class[T]): Boolean
+		/** @since 0.3.0 */
+		def has [T: ClassTag]: Boolean
+		/** @since 0.3.0 */
+		def has [T: ClassTag] (i: T): Boolean
+		
+		/** @since 0.3.0 */
+		infix def ?: [T] (clazz: Class[T]): Boolean
+		/** @since 0.3.0 */
+		infix def ?: [T: ClassTag] (i: T): Boolean
+		
+	}
+	
+	/** The definition of methods that aims to check whether any variable with one type is
+	  * provided, and remove the matched variable if presents.
+	  *
+	  * This may look like the [[HasOps]] with [[PopOps]] features, or the [[DiscardOps]] with a
+	  * fancy way.
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
+	trait AcceptOps {
+		
+		/** @since 0.3.0 */
+		def accept [T] (clazz: Class[T]): Boolean
+		/** @since 0.3.0 */
+		def accept [T: ClassTag]: Boolean
+		/** @since 0.3.0 */
+		def accept [T: ClassTag] (i: T): Boolean
+		
+		/** @since 0.3.0 */
+		infix def ?^ [T] (clazz: Class[T]): Boolean
+		/** @since 0.3.0 */
+		infix def ?^ [T: ClassTag] (i: T): Boolean
+		
+	}
+	
+	/** The definition of methods that aims to check whether any variable with one type is
+	  * provided, and the variable in context equals the checking variable. If all of these
+	  * matches, the variable will also be deleted.
+	  *
+	  * The combination of [[ContainsOps]] and [[PopOps]]
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
+	trait DrainOps {
+		
+		/** @since 0.3.0 */
+		def drain [T: ClassTag] (value: T): Boolean
+		/** @since 0.3.0 */
+		infix def ?! [T: ClassTag] (value: T): Boolean
+		
+	}
+	
+	/** The definition of methods that aims to check whether any variable with one type is
+	  * provided, and the variable in context equals the checking variable.
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
+	trait ContainsOps {
+		
+		/** @since 0.3.0 */
+		def contains [T: ClassTag] (value: T): Boolean
+		/** @since 0.3.0 */
+		infix def ?* [T: ClassTag] (value: T): Boolean
 		
 	}
 	

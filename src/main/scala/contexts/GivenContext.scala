@@ -244,6 +244,41 @@ class GivenContext private (
 	override infix def !>> [T: ClassTag, U] (consumer: T => U): ConsumeResult[U] =
 		this.take(consumer)
 	
+	override def has [T] (clazz: Class[T]): Boolean =
+		this.get(clazz).isRight
+	override def has [T: ClassTag]: Boolean =
+		this.has(classTag[T].runtimeClass)
+	override def has [T: ClassTag] (i: T): Boolean =
+		this.has
+	override infix def ?: [T] (clazz: Class[T]): Boolean =
+		this.has(clazz)
+	override infix def ?: [T: ClassTag] (i: T): Boolean =
+		this.has(classTag[T].runtimeClass)
+	
+	override def accept [T] (clazz: Class[T]): Boolean =
+		this.discard(clazz)
+	override def accept [T: ClassTag]: Boolean =
+		this.accept(classTag[T].runtimeClass)
+	override def accept [T: ClassTag] (i: T): Boolean =
+		this.accept
+	override infix def ?^ [T] (clazz: Class[T]): Boolean =
+		this.accept(clazz)
+	override infix def ?^ [T: ClassTag] (i: T): Boolean =
+		this.accept
+	
+	override def contains [T: ClassTag] (value: T): Boolean =
+		this.get[T] == value
+	override infix def ?* [T: ClassTag] (value: T): Boolean =
+		this.contains(value)
+	
+	override def drain [T: ClassTag] (value: T): Boolean =
+		if this.contains(value) then
+			this.discard[T]
+			true
+		else false
+	override infix def ?! [T: ClassTag] (value: T): Boolean =
+		this.drain(value)
+	
 	override def / (owner: Class[?]): OwnedContext =
 		OwnedContext(owner)
 	override def / (owner: AnyRef): OwnedContext =
@@ -346,7 +381,7 @@ class GivenContext private (
 		@throws[ContextNotGivenException]
 		override infix def !>!>[T] (clazz: Class[T]): T = this.popUnsafe(clazz)
 		
-		override def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] = // TODO: tests
+		override def use [T, U] (clazz: Class[T])(consumer: T => U): ConsumeResult[U] =
 			this.get(clazz) match
 				case Left(e) => ConsumeFailed[U](e)
 				case Right(i) => ConsumeSucceed[U](consumer(i))
@@ -368,6 +403,42 @@ class GivenContext private (
 				case Right(i) => ConsumeSucceed[U](consumer(i))
 		override def take[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(classTag[T].runtimeClass.asInstanceOf[Class[T]])(consumer)
 		override infix def !>>[T: ClassTag, U] (consumer: T => U): ConsumeResult[U] = this.take(consumer)
+		
+		
+		override def has [T] (clazz: Class[T]): Boolean =
+			this.get(clazz).isRight
+		override def has [T: ClassTag]: Boolean =
+			this.has(classTag[T].runtimeClass)
+		override def has [T: ClassTag] (i: T): Boolean =
+			this.has
+		override infix def ?: [T] (clazz: Class[T]): Boolean =
+			this.has(clazz)
+		override infix def ?: [T: ClassTag] (i: T): Boolean =
+			this.has(classTag[T].runtimeClass)
+		
+		override def accept [T] (clazz: Class[T]): Boolean =
+			this.discard(clazz)
+		override def accept [T: ClassTag]: Boolean =
+			this.accept(classTag[T].runtimeClass)
+		override def accept [T: ClassTag] (i: T): Boolean =
+			this.accept
+		override infix def ?^ [T] (clazz: Class[T]): Boolean =
+			this.accept(clazz)
+		override infix def ?^ [T: ClassTag] (i: T): Boolean =
+			this.accept
+		
+		override def contains [T: ClassTag] (value: T): Boolean =
+			this.get[T] == value
+		override infix def ?* [T: ClassTag] (value: T): Boolean =
+			this.contains(value)
+		
+		override def drain [T: ClassTag] (value: T): Boolean =
+			if this.contains(value) then
+				this.discard[T]
+				true
+			else false
+		override infix def ?! [T: ClassTag] (value: T): Boolean =
+			this.drain(value)
 		
 	}
 	
