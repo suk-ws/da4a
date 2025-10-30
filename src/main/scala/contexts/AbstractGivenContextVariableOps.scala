@@ -304,9 +304,9 @@ object AbstractGivenContextVariableOps extends Helpers {
 		def has [T: ClassTag] (i: T): Boolean
 		
 		/** @since 0.3.0 */
-		infix def ?: [T] (clazz: Class[T]): Boolean
+		infix def ?# [T] (clazz: Class[T]): Boolean
 		/** @since 0.3.0 */
-		infix def ?: [T: ClassTag] (i: T): Boolean
+		infix def ?# [T: ClassTag] (i: T): Boolean
 		
 	}
 	
@@ -332,9 +332,27 @@ object AbstractGivenContextVariableOps extends Helpers {
 		def accept [T: ClassTag] (i: T): Boolean
 		
 		/** @since 0.3.0 */
-		infix def ?^ [T] (clazz: Class[T]): Boolean
+		infix def ?#- [T] (clazz: Class[T]): Boolean
 		/** @since 0.3.0 */
-		infix def ?^ [T: ClassTag] (i: T): Boolean
+		infix def ?#- [T: ClassTag] (i: T): Boolean
+		
+	}
+	
+	/** The definition of methods that aims to check whether any variable with one type is
+	  * provided, and the variable in context equals the checking variable.
+	  *
+	  * For many usage, you should not extend this trait but to use
+	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
+	  * version.
+	  *
+	  * @since 0.3.0
+	  */
+	trait ContainsOps {
+		
+		/** @since 0.3.0 */
+		def contains [T: ClassTag] (value: T): Boolean
+		/** @since 0.3.0 */
+		infix def ?* [T: ClassTag] (value: T): Boolean
 		
 	}
 	
@@ -355,25 +373,7 @@ object AbstractGivenContextVariableOps extends Helpers {
 		/** @since 0.3.0 */
 		def drain [T: ClassTag] (value: T): Boolean
 		/** @since 0.3.0 */
-		infix def ?! [T: ClassTag] (value: T): Boolean
-		
-	}
-	
-	/** The definition of methods that aims to check whether any variable with one type is
-	  * provided, and the variable in context equals the checking variable.
-	  *
-	  * For many usage, you should not extend this trait but to use
-	  * [[AbstractGivenContextVariableOps]]. This trait may move to another location in newer
-	  * version.
-	  *
-	  * @since 0.3.0
-	  */
-	trait ContainsOps {
-		
-		/** @since 0.3.0 */
-		def contains [T: ClassTag] (value: T): Boolean
-		/** @since 0.3.0 */
-		infix def ?* [T: ClassTag] (value: T): Boolean
+		infix def ?- [T: ClassTag] (value: T): Boolean
 		
 	}
 	

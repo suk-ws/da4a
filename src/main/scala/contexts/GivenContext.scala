@@ -250,9 +250,9 @@ class GivenContext private (
 		this.has(classTag[T].runtimeClass)
 	override def has [T: ClassTag] (i: T): Boolean =
 		this.has
-	override infix def ?: [T] (clazz: Class[T]): Boolean =
+	override infix def ?# [T] (clazz: Class[T]): Boolean =
 		this.has(clazz)
-	override infix def ?: [T: ClassTag] (i: T): Boolean =
+	override infix def ?# [T: ClassTag] (i: T): Boolean =
 		this.has(classTag[T].runtimeClass)
 	
 	override def accept [T] (clazz: Class[T]): Boolean =
@@ -261,9 +261,9 @@ class GivenContext private (
 		this.accept(classTag[T].runtimeClass)
 	override def accept [T: ClassTag] (i: T): Boolean =
 		this.accept
-	override infix def ?^ [T] (clazz: Class[T]): Boolean =
+	override infix def ?#- [T] (clazz: Class[T]): Boolean =
 		this.accept(clazz)
-	override infix def ?^ [T: ClassTag] (i: T): Boolean =
+	override infix def ?#- [T: ClassTag] (i: T): Boolean =
 		this.accept
 	
 	override def contains [T: ClassTag] (value: T): Boolean =
@@ -276,7 +276,7 @@ class GivenContext private (
 			this.discard[T]
 			true
 		else false
-	override infix def ?! [T: ClassTag] (value: T): Boolean =
+	override infix def ?- [T: ClassTag] (value: T): Boolean =
 		this.drain(value)
 	
 	override def / (owner: Class[?]): OwnedContext =
@@ -411,9 +411,9 @@ class GivenContext private (
 			this.has(classTag[T].runtimeClass)
 		override def has [T: ClassTag] (i: T): Boolean =
 			this.has
-		override infix def ?: [T] (clazz: Class[T]): Boolean =
+		override infix def ?# [T] (clazz: Class[T]): Boolean =
 			this.has(clazz)
-		override infix def ?: [T: ClassTag] (i: T): Boolean =
+		override infix def ?# [T: ClassTag] (i: T): Boolean =
 			this.has(classTag[T].runtimeClass)
 		
 		override def accept [T] (clazz: Class[T]): Boolean =
@@ -422,9 +422,9 @@ class GivenContext private (
 			this.accept(classTag[T].runtimeClass)
 		override def accept [T: ClassTag] (i: T): Boolean =
 			this.accept
-		override infix def ?^ [T] (clazz: Class[T]): Boolean =
+		override infix def ?#- [T] (clazz: Class[T]): Boolean =
 			this.accept(clazz)
-		override infix def ?^ [T: ClassTag] (i: T): Boolean =
+		override infix def ?#- [T: ClassTag] (i: T): Boolean =
 			this.accept
 		
 		override def contains [T: ClassTag] (value: T): Boolean =
@@ -437,7 +437,7 @@ class GivenContext private (
 				this.discard[T]
 				true
 			else false
-		override infix def ?! [T: ClassTag] (value: T): Boolean =
+		override infix def ?- [T: ClassTag] (value: T): Boolean =
 			this.drain(value)
 		
 	}
