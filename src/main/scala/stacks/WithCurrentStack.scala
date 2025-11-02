@@ -31,7 +31,8 @@ object WithCurrentStack {
 	@noinline
 	@throws[SecurityException]
 	def getStackTrace (offset: Int = 0): Array[StackTraceElement] = {
-		Thread.currentThread.asInstanceOf[Thread].getStackTrace.asInstanceOf[Array[StackTraceElement]]
+		Thread.currentThread.nn.getStackTrace
+			.asInstanceOf[Array[StackTraceElement]]
 			.drop(1)
 			.dropWhile(s => s.getClassName == classOf[WithCurrentStack].getName || s.getClassName == classOf[WithCurrentStack.type].getName)
 			.drop(offset)
@@ -47,14 +48,13 @@ object WithCurrentStack {
 	  *
 	  * @throws SecurityException if a security manager exists and its checkPermission method
 	  *                           doesn't allow getting the stack trace of current thread.
-	  *
 	  * @see [[getStackTrace(Int)]]
-	  *
 	  * @since 0.2.0
 	  */
 	@noinline
 	@throws[SecurityException]
 	def getStackTrace: Array[StackTraceElement] =
+		//noinspection RedundantDefaultArgument
 		getStackTrace(0)
 	
 	/**
@@ -70,7 +70,7 @@ object WithCurrentStack {
 	  * @throws SecurityException if a security manager exists and its checkPermission method
 	  *                           doesn't allow getting the stack trace of current thread.
 	  * @throws EmptyStackException if there's no any stack trace element in current stack trace
-	  *                             that is not in the given class. This may happens when this
+	  *                             that is not in the given class. This may happen when this
 	  *                             thread is just called in the main method etc.
 	  * @return The last(most recent) stack trace element that is not in the given class
 	  */
@@ -93,7 +93,7 @@ object WithCurrentStack {
 	  * @throws SecurityException   if a security manager exists and its checkPermission method
 	  *                             doesn't allow getting the stack trace of current thread.
 	  * @throws EmptyStackException if there's no any stack trace element in current stack trace
-	  *                             that is not in the given class. This may happens when this
+	  *                             that is not in the given class. This may happen when this
 	  *                             thread is just called in the main method etc.
 	  * @return The last(most recent) stack trace element that is not in the given class
 	  */

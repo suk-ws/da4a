@@ -5,7 +5,7 @@ import scala.annotation.targetName
 
 /** Statistics for numbers.
   *
-  * Gives a easy way to get amount of numbers min/max/sum value.
+  * Gives an easy way to get amount of numbers min/max/sum value.
   *
   * Use [[++]] to collect a value to statistics, use [[value]] to
   * get the statistic results.
@@ -73,7 +73,7 @@ class NumericStatistics [T] (using role: Numeric[T]) {
 	
 	/** Reset the statistics to the initial state.
 	  *
-	  * All the collected data will be drop.
+	  * All the collected data will be dropped.
 	  */
 	def reset (): Unit =
 		state = None
@@ -92,7 +92,7 @@ class NumericStatistics [T] (using role: Numeric[T]) {
 	
 	/** The number counts in the statistics.
 	  *
-	  * It will always returns a [[Int]] value, regardless if the
+	  * It will always return a [[Int]] value, regardless if the
 	  * statistic is collected some data.
 	  */
 	def count: Int =

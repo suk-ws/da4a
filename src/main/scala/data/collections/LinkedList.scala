@@ -37,7 +37,7 @@ class LinkedList [E]
 	private val list: JLinkedList[E] = new JLinkedList[E]()
 	
 	override def iterator: Iterator[E] =
-		list.iterator.asInstanceOf[JIterator[E]].asScala
+		list.iterator.nn.asScala
 	override def iterableFactory: SeqFactory[LinkedList] =
 		LinkedList
 	
@@ -68,7 +68,7 @@ class LinkedList [E]
 		this
 	
 	override def remove (idx: Int): E =
-		list.remove(idx).asInstanceOf[E]
+		list.remove(idx).nn
 	override def remove (idx: Int, count: Int): Unit =
 		for (_ <- 1 to count)
 			list.remove(idx)
@@ -78,7 +78,7 @@ class LinkedList [E]
 	
 	override def patchInPlace (from: Int, patch: IterableOnce[E], replaced: Int): LinkedList.this.type =
 		val newIter = patch.iterator
-		val currIter = list.listIterator().asInstanceOf[JListIterator[E]]
+		val currIter = list.listIterator().nn
 		currIter.next()
 		for (_ <- 1 to from)
 			currIter.next()
@@ -99,9 +99,9 @@ class LinkedList [E]
 		this
 	
 	override def removeIf (predicate: E => Boolean): LinkedList.this.type =
-		val iter = list.listIterator.asInstanceOf[JListIterator[E]]
+		val iter = list.listIterator.nn
 		while iter.hasNext do
-			if predicate(iter.next().asInstanceOf[E]) then
+			if predicate(iter.next().nn) then
 				iter.remove()
 		this
 	
