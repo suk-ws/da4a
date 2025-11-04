@@ -52,7 +52,10 @@ trait ManageableEventOps [EP, ER] extends AbstractManageableEvent[EP, ER] {
 		this
 	}
 	
-	override protected[event] def getErrorHandler =
+	override protected[event] def getErrorHandler: Option[EventListenerErrorHandler] =
 		errorHandler
 	
+//	override def emit (eventParams: EP): List[ER] throws Emitter.UnsupportedEventTypeException =
+//		Emitter.emittingFor(this).emit(eventParams)
+
 }

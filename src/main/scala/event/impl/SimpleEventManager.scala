@@ -2,7 +2,6 @@ package cc.sukazyo.std
 package event.impl
 
 import event.SimpleEvent
-import event.emitter.Emitter
 
 import scala.collection.mutable
 
@@ -72,10 +71,6 @@ class SimpleEventManager [T, R] extends SimpleEvent[T, R] {
 			.toList
 			.map(x => cb(x))
 	}
-	
-	// todo docs
-	override def emit (eventParams: T): List[R] =
-		Emitter.emittingFor(this).emit(eventParams)
 	
 }
 

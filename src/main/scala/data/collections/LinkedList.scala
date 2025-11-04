@@ -2,11 +2,8 @@ package cc.sukazyo.std
 package data.collections
 
 import java.util.LinkedList as JLinkedList
-import java.util.Iterator as JIterator
-import java.util.ListIterator as JListIterator
-import scala.collection.{mutable, *}
 import scala.collection.generic.DefaultSerializable
-import scala.collection.mutable.{ReusableBuilder, SeqOps}
+import scala.collection.{mutable, *}
 import scala.jdk.CollectionConverters.*
 
 /** LinkedList implementation for scala.
@@ -45,9 +42,7 @@ class LinkedList [E]
 		list.asScala.toList
 	
 	override def apply (idx: Int): E =
-		list.get(idx) match
-			case null => throw new IndexOutOfBoundsException
-			case value => value
+		list.get(idx)
 	
 	override def length: Int = list.size
 	

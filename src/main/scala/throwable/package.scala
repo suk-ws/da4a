@@ -15,7 +15,7 @@ package object throwable {
 		def toLogString: String =
 			val stackTrace = StringWriter()
 			throwable `printStackTrace` PrintWriter(stackTrace)
-			stackTrace toString
+			stackTrace.toString
 		
 	}
 	

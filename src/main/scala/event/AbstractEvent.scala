@@ -71,25 +71,25 @@ trait AbstractEvent [EP, ER] {
 	  */
 	def removeListener (listener: MyCallback): AbstractEvent.this.type
 	
-	/** Emit the event.
-	  *
-	  * This will call all the listeners with the provided event parameters [[EP]] in some
-	  * order synchronized.
-	  *
-	  * The implementations determine the order of calling the listeners.
-	  *
-	  * The emit method doesn't catch errors.
-	  * If any listener throws an unhandled exception, the exception will be thrown to the
-	  * [[emit]] caller.
-	  * 
-	  * @since 0.2.0
-	 *  
-	 *  @deprecated use [[foreachListeners]] and [[cc.sukazyo.std.event.emitter.Emitter]] instead.
-	  *
-	  * @param eventParams The event parameters [[EP]]. Will be passed to all the listeners.
-	  * @return A list of the event results [[ER]]. Contains every listener's return value.
-	  */
-	@deprecated("use foreachListener instead", "da4a 0.2.0")
-	def emit (eventParams: EP): List[ER]
+//	/** Emit the event.
+//	  *
+//	  * This will call all the listeners with the provided event parameters [[EP]] in some
+//	  * order synchronized.
+//	  *
+//	  * The implementations determine the order of calling the listeners.
+//	  *
+//	  * The emit method doesn't catch errors.
+//	  * If any listener throws an unhandled exception, the exception will be thrown to the
+//	  * [[emit]] caller.
+//	  *
+//	  * @since 0.2.0
+//	 *
+//	 *  @deprecated use [[foreachListeners]] and [[cc.sukazyo.std.event.emitter.Emitter]] instead.
+//	  *
+//	  * @param eventParams The event parameters [[EP]]. Will be passed to all the listeners.
+//	  * @return A list of the event results [[ER]]. Contains every listener's return value.
+//	  */
+//	@deprecated("use foreachListener instead", "da4a 0.2.0")
+//	def emit (eventParams: EP): List[ER] throws UnsupportedEventTypeException
 	
 }

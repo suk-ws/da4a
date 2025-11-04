@@ -3,6 +3,8 @@ package contexts
 
 import org.scalatest.Assertion
 
+import scala.language.postfixOps
+
 // TODO: error message related test have not been tested
 class TestGivenContext extends BaseTestsSuite {
 	
@@ -23,7 +25,7 @@ class TestGivenContext extends BaseTestsSuite {
 		"just created" - {
 			val table = Table(
 				("name", "generator"),
-				("by new keyword", () => new GivenContext()),
+//				("by new keyword", () => new GivenContext()),
 				("by apply method", () => GivenContext.apply()),
 			)
 			forAll(table) { (name: String, generator: ()=>GivenContext) => s"$name" - {
@@ -75,6 +77,7 @@ class TestGivenContext extends BaseTestsSuite {
 				
 				"should have the same data" in {
 					val (original, copy) = contexts(copier)
+					given canEqualAny[L, R]: CanEqual[L, R] = CanEqual.derived
 					original.get[String] shouldBe copy.get[String]
 					original.ownedBy[GivenContext].get[String] shouldBe copy.ownedBy[GivenContext].get[String]
 				}
@@ -164,6 +167,9 @@ class TestGivenContext extends BaseTestsSuite {
 		}
 		
 		"should be able to take out a value" - {
+			
+			// This is used under assertCompiles, do not remove!
+			import contexts.GivenContext.CxtOption
 			
 			"in global scope" - {
 				val _c = GivenContext()

@@ -78,14 +78,14 @@ trait RichEventOps [EP, ER]
 	override def removeListener (listener: MyCallback): RichEventOps.this.type = {
 		removeListenerIf {
 			case simpleCbListener: EventListener.CallbackIsSimpleFunction[?, ?] =>
-				simpleCbListener.simpleCallbackFunction == listener
+				simpleCbListener.simpleCallbackFunction eq listener
 			case _ => false
 		}
 		this
 	}
 	
 	override def removeListener (listener: MyListener): RichEventOps.this.type = {
-		removeListenerIf(_ == listener)
+		removeListenerIf(_ eq listener)
 		this
 	}
 	
@@ -98,7 +98,7 @@ trait RichEventOps [EP, ER]
 	def removeRichListener (listener: MyRichCallback): RichEventOps.this.type = {
 		removeListenerIf {
 			case richCbListener: EventListener.CallbackIsFunction[?, ?] =>
-				richCbListener.callbackFunction == listener
+				richCbListener.callbackFunction eq listener
 			case _ => false
 		}
 		this

@@ -89,8 +89,8 @@ object ByteHexConverter {
 		  */
 		def toHex: String =
 			val sb = StringBuilder()
-			for (b <- data) sb ++= (b toHex)
-			sb toString
+			for (b <- data) sb ++= b.toHex
+			sb.toString
 		
 	}
 	

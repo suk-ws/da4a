@@ -2,7 +2,6 @@ package cc.sukazyo.std
 package event.impl
 
 import data.collections.LinkedList
-import event.emitter.Emitter
 import event.{EventListener, ManageableEvent, RichEvent}
 
 /** todo: docs
@@ -42,8 +41,5 @@ trait EventManager [EP, ER] extends RichEvent[EP, ER]
 		listeners.toList
 			.map(x => cb(x))
 	}
-	
-	override def emit (eventParams: EP): List[ER] =
-		Emitter.emittingFor(this).emit(eventParams)
 	
 }

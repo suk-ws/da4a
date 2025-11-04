@@ -1,12 +1,13 @@
 package cc.sukazyo.std
 package event.emitter
 
+import event.emitter.Emitter.UnsupportedEventTypeException
 import event.emitter.impl.BaseEmitter
 import event.{AbstractEvent, AbstractManageableEvent, EventContext}
 
 trait Emitter [EP, ER, EV <: AbstractEvent[EP, ER]] {
 	
-	def emit (params: EP): List[ER]
+	def emit (params: EP): List[ER] throws UnsupportedEventTypeException
 	
 	protected def patchContext (event: AbstractManageableEvent[EP, ER], context: EventContext[EP]): Unit =
 		event.patchContext(context)

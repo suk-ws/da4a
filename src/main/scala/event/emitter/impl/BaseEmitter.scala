@@ -11,7 +11,7 @@ import scala.util.boundary.break
 
 trait BaseEmitter [EP, ER, EV <: AbstractEvent[EP, ER]] (event: EV) extends Emitter[EP, ER, EV] {
 	
-	override def emit (params: EP): List[ER] =
+	override def emit (params: EP): List[ER] throws UnsupportedEventTypeException =
 		event match
 			case simpleEmittable: SimpleEmittableEvent[EP, ER] =>
 				

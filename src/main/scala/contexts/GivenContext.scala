@@ -267,7 +267,11 @@ class GivenContext private (
 		this.accept
 	
 	override def contains [T: ClassTag] (value: T): Boolean =
-		this.get[T] == value
+		//noinspection DuplicatedCode
+		given CanEqual[T, T] = CanEqual.derived
+		this.get[T] match
+			case Right(x) => x == value
+			case Left(_) => false
 	override infix def ?* [T: ClassTag] (value: T): Boolean =
 		this.contains(value)
 	
@@ -300,6 +304,7 @@ class GivenContext private (
 		override def isOwnedBy [OT: ClassTag]: Boolean =
 			isOwnedBy(classTag[OT].runtimeClass)
 		override def isOwnedBy (clazz: Class[?]): Boolean =
+			given CanEqual[Class[?], Class[?]] = CanEqual.derived
 			thisClazz == clazz
 		
 		override def size: Int = getThisMap.map(_.size).getOrElse(0)
@@ -428,7 +433,11 @@ class GivenContext private (
 			this.accept
 		
 		override def contains [T: ClassTag] (value: T): Boolean =
-			this.get[T] == value
+			//noinspection DuplicatedCode
+			given CanEqual[T, T] = CanEqual.derived
+			this.get[T] match
+				case Right(x) => x == value
+				case Left(_) => false
 		override infix def ?* [T: ClassTag] (value: T): Boolean =
 			this.contains(value)
 		

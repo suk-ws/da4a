@@ -4,6 +4,7 @@ import random.generator.ScalaStaticRandomGenerator
 import random.generator.RandomGenerator.{RandomDoubleGenerator, RandomIntGenerator}
 
 import scala.collection.mutable.ListBuffer
+import scala.language.implicitConversions
 
 package object random {
 	

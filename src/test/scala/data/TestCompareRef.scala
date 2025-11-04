@@ -1,6 +1,6 @@
-package cc.sukazyo.std
-package data
-
+//package cc.sukazyo.std
+//package data
+//
 //class TestCompareRef extends BaseDataTestSuite {
 //	
 //	"when using sameAs or =#= operator comparing two objects" - {

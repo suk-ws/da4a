@@ -1,6 +1,6 @@
 aether.AetherKeys.aetherOldVersionMethod := true
 
-ThisBuild / scalaVersion := "3.4.1"
+ThisBuild / scalaVersion := "3.7.3"
 
 ThisBuild / organization := "cc.sukazyo"
 ThisBuild / organizationName := "Sukazyo Workshop"
@@ -22,8 +22,8 @@ ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / resolvers ++= ProjectMetadata.resolvers
 
 val encoding = "UTF-8"
-val javaTarget = "1.8"
-val javaTarget_scala = "8"
+val javaTarget = "11"
+val javaTarget_scala = javaTarget
 
 lazy val root = (project in file("."))
 	.settings(
@@ -41,24 +41,30 @@ lazy val root = (project in file("."))
 		libraryDependencies ++= ProjectMetadata.dependencies,
 		
 		Compile / doc / scalacOptions ++= Seq(
-			"-private",
+			"-private", // ?
 		),
 		
 		scalacOptions ++= Seq(
-			"-language:postfixOps",
-			"-language:experimental.macros",
-			"-language:implicitConversions",
-			"-language:noAutoTupling",
-			"-language:canThrow",
-			"-Yexplicit-nulls",
-			"-Ysafe-init",
-			"-unchecked",
-			"-explain",
-			"-explain-types",
+//			"-language:postfixOps", // enable postfixOps (a.b => a b)
+			"-language:experimental.macros", // enable macros feature
+			"-language:experimental.saferExceptions", // enable throws keyword for methods
+//			"-language:implicitConversions", // allow scala2 implicit conversion definition
+//			                                 // suppress auto conversion warnings
+			"-language:noAutoTupling", // disable auto tupling ( a(1, 2) => a((1, 2)) )
+			"-language:strictEquality", // errors when comparing val with non-related type
+			"-Yexplicit-nulls", // explicit null check, T|Null != T
+			"-Wsafe-init", // error on check init
+//			"-Xkind-projector", // enable https://github.com/typelevel/kind-projector (?)
+			"-unchecked", // warnings when code is based on assumptions
+			"-explain", // explain error in more detail
+			"-explain-types", // explain type error in more detail
+			"-deprecation", // show deprecated warnings
+			"-feature", // show feature warnings
 			"-encoding", encoding,
 			"-release", javaTarget_scala,
 		),
 		javacOptions ++= Seq(
+			"-Xlint:deprecation", // show deprecated warnings
 			"-encoding", encoding,
 			"-source", javaTarget,
 			"-target", javaTarget,
