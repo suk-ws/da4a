@@ -9,47 +9,59 @@ import scala.util.boundary.break
 
 object InputCommandParser {
 	
-	object ClassicStrictParser extends InputCommandParser {
-//		override val useQuotes: Boolean = true
-//		override val strictQuoteFullArgument: Boolean = false
-		override val allowQuoteInQuotes: Boolean = false
-		override val allowUnclosedQuotes: Boolean = false
-		override val allowNewLine: Boolean = false
-		override val newLineAsSeparator: Boolean = false
-		override val allowNewLineInQuotes: Boolean = false
-		override val newLineBreakQuotes: Boolean = false
-		override val tabAsSeparator: Boolean = false
-		override val allowEscapeAtEnd: Boolean = false
-		override val escapeNonSpecialChars: Boolean = false
+	private def classicBaseBuilder (): Builder = Builder()
+		.setNewLineAsSeparator(false)
+		.setNewLineBreakQuotes(false)
+		.setTabAsSeparator(false)
+	
+	val classicLossyParser: InputCommandParser = classicBaseBuilder().build()
+	
+	val classicStrictParser: InputCommandParser = classicBaseBuilder()
+		.setAllowQuoteInQuotes(false)
+		.setAllowUnclosedQuotes(false)
+		.setAllowNewLine(false)
+		.setAllowNewLineInQuotes(false)
+		.setAllowEscapeAtEnd(false)
+		.build()
+	
+	class Builder {
+		
+		private var allowQuoteInQuotes: Boolean = true
+		def setAllowQuoteInQuotes (value: Boolean): this.type = { this.allowQuoteInQuotes = value; this }
+		private var allowUnclosedQuotes: Boolean = true
+		def setAllowUnclosedQuotes (value: Boolean): this.type = { this.allowUnclosedQuotes = value; this }
+		private var allowNewLine: Boolean = true
+		def setAllowNewLine (value: Boolean): this.type = { this.allowNewLine = value; this }
+		private var newLineAsSeparator: Boolean = true
+		def setNewLineAsSeparator (value: Boolean): this.type = { this.newLineAsSeparator = value; this }
+		private var allowNewLineInQuotes: Boolean = true
+		def setAllowNewLineInQuotes (value: Boolean): this.type = { this.allowNewLineInQuotes = value; this }
+		private var newLineBreakQuotes: Boolean = true
+		def setNewLineBreakQuotes (value: Boolean): this.type = { this.newLineBreakQuotes = value; this }
+		private var tabAsSeparator: Boolean = true
+		def setTabAsSeparator (value: Boolean): this.type = { this.tabAsSeparator = value; this }
+		private var allowEscapeAtEnd: Boolean = true
+		def setAllowEscapeAtEnd (value: Boolean): this.type = { this.allowEscapeAtEnd = value; this }
+		private var escapeNonSpecialChars: Boolean = false
+		def setEscapeNonSpecialChars (value: Boolean): this.type = { this.escapeNonSpecialChars = value; this }
+		
+		def build (): InputCommandParser = {
+			val self = this
+			new InputCommandParser {
+				override val allowQuoteInQuotes: Boolean = self.allowQuoteInQuotes
+				override val allowUnclosedQuotes: Boolean = self.allowUnclosedQuotes
+				override val allowNewLine: Boolean = self.allowNewLine
+				override val newLineAsSeparator: Boolean = self.newLineAsSeparator
+				override val allowNewLineInQuotes: Boolean = self.allowNewLineInQuotes
+				override val newLineBreakQuotes: Boolean = self.newLineBreakQuotes
+				override val tabAsSeparator: Boolean = self.tabAsSeparator
+				override val allowEscapeAtEnd: Boolean = self.allowEscapeAtEnd
+				override val escapeNonSpecialChars: Boolean = self.escapeNonSpecialChars
+			}
+		}
 	}
 	
-	object ClassicLossyParser extends InputCommandParser {
-//		override val useQuotes: Boolean = true
-//		override val strictQuoteFullArgument: Boolean = false
-		override val allowQuoteInQuotes: Boolean = true
-		override val allowUnclosedQuotes: Boolean = true
-		override val allowNewLine: Boolean = true
-		override val newLineAsSeparator: Boolean = false
-		override val allowNewLineInQuotes: Boolean = true
-		override val newLineBreakQuotes: Boolean = false
-		override val tabAsSeparator: Boolean = false
-		override val allowEscapeAtEnd: Boolean = true
-		override val escapeNonSpecialChars: Boolean = false
-	}
-	
-	object Default extends InputCommandParser {
-//		override val useQuotes: Boolean = true
-//		override val strictQuoteFullArgument: Boolean = false
-		override val allowQuoteInQuotes: Boolean = true
-		override val allowUnclosedQuotes: Boolean = true
-		override val allowNewLine: Boolean = true
-		override val newLineAsSeparator: Boolean = true
-		override val allowNewLineInQuotes: Boolean = true
-		override val newLineBreakQuotes: Boolean = true
-		override val tabAsSeparator: Boolean = true
-		override val allowEscapeAtEnd: Boolean = true
-		override val escapeNonSpecialChars: Boolean = false
-	}
+	val default: InputCommandParser = Builder().build()
 	
 }
 
@@ -122,7 +134,7 @@ trait InputCommandParser {
 			else false
 	}
 	
-	def parse (input: String): (args: Array[String], remainsRaw: String) = {
+	def parse (input: String, safeArgs: Int = 1): (args: Array[String], remainsRaw: String) = {
 		given CanEqual[Char|Null, Null] = CanEqual.derived
 		given CanEqual[Char|Null, Char] = CanEqual.derived
 		
@@ -148,9 +160,9 @@ trait InputCommandParser {
 		
 		while (i < input.length) {
 			boundary {
-				
-				// now first arg is already parsed, put everything remains to remains
-				if (parsed.nonEmpty) {
+
+				// now required counts of args are already parsed, put everything remains to remains
+				if (parsed.length >= safeArgs) {
 					remains += c
 				}
 				

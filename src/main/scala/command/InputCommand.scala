@@ -18,7 +18,7 @@ object InputCommand {
 		Some(new InputCommand(args(0), args.drop(1), remains))
 	}
 	
-	def apply (parser: InputCommandParser = InputCommandParser.Default)(input: String): Option[InputCommand] = {
+	def apply (parser: InputCommandParser = InputCommandParser.default)(input: String): Option[InputCommand] = {
 		val result = parser.parse(input)
 		apply(result.args, result.remainsRaw)
 	}
