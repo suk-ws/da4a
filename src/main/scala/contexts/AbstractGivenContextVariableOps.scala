@@ -296,16 +296,61 @@ object AbstractGivenContextVariableOps extends Helpers {
 	  */
 	trait HasOps {
 		
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context.
+		  *
+		  * This is equivalent to `.get(clazz).isRight`.
+		  *
+		  * @since 0.3.0
+		  */
 		def has [T] (clazz: Class[T]): Boolean
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context.
+		  *
+		  * This is equivalent to `.get[T].isRight`.
+		  *
+		  * @since 0.3.0
+		  */
 		def has [T: ClassTag]: Boolean
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context.
+		  *
+		  * This method does not check whether the value in context equals the given value `i`,
+		  * it only checks if *any value in this type* exists.
+		  *
+		  * This method aims to simplify the cases, which one tag is defined by using Scala's
+		  * object feature, like `object SomeTag`.
+		  *
+		  * If you are using enums as tags, note that different enum value in one enum class
+		  * is with the same type in Java. For those cases that you want to check value
+		  * equation, use [[ContainsOps.contains]] instead.
+		  *
+		  * This is equivalent to `.get(i.getClass).isRight`.
+		  *
+		  * @since 0.3.0
+		  */
 		def has [T: ClassTag] (i: T): Boolean
 		
-		/** @since 0.3.0 */
+		/** If one type of value is provided in this context.
+		  *
+		  * The operator version of [[has]].
+		  *
+		  * @since 0.3.0
+		  */
 		infix def ?# [T] (clazz: Class[T]): Boolean
-		/** @since 0.3.0 */
+		/** If one type of value is provided in this context.
+		  *
+		  * The operator version of [[has]].
+		  *
+		  * This operator does not check whether the value in context equals the given value
+		  * `i`, it only checks if *any value in this type* exists.
+		  *
+		  * This operator aims to simplify the cases, which one tag is defined by using Scala's
+		  * object feature, like `object SomeTag`.
+		  *
+		  * If you are using enums as tags, note that different enum value in one enum class
+		  * is with the same type in Java. For those cases that you want to check value
+		  * equation, use [[ContainsOps.?*]] instead.
+		  *
+		  * @since 0.3.0
+		  */
 		infix def ?# [T: ClassTag] (i: T): Boolean
 		
 	}
@@ -324,16 +369,56 @@ object AbstractGivenContextVariableOps extends Helpers {
 	  */
 	trait AcceptOps {
 		
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context and remove the value from
+		  * context if exists.
+		  *
+		  * This is equivalent to `.pop(clazz).isRight` or `.discard(clazz)`.
+		  *
+		  * @since 0.3.0
+		  */
 		def accept [T] (clazz: Class[T]): Boolean
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context and remove the value from
+		  * context if exists.
+		  *
+		  * This is equivalent to `.pop[T].isRight` or `.discard[T]`.
+		  *
+		  * @since 0.3.0
+		  */
 		def accept [T: ClassTag]: Boolean
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context and remove the value from
+		  * context if exists.
+		  *
+		  * The specific value is not checked, only its type information is used.
+		  *
+		  * Due to it uses [[ClassTag]] to fetch the type information, the class of value used
+		  * by this method may be not the parameter's accurate class but the compile time class
+		  * (the class that uses in typecheck). If you want the accurate class used, you need
+		  * to use `.accept(i.getClass())`.
+		  *
+		  * @since 0.3.0
+		  */
 		def accept [T: ClassTag] (i: T): Boolean
 		
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context and remove the value from
+		  * context if exists.
+		  *
+		  * This is equivalent to `.pop(clazz).isRight` or `.discard(clazz)`.
+		  *
+		  * @since 0.3.0
+		  */
 		infix def ?#- [T] (clazz: Class[T]): Boolean
-		/** @since 0.3.0 */
+		/** Check whether one type of value exists in this context and remove the value from
+		  * context if exists.
+		  *
+		  * The specific value is not checked, only its type information is used.
+		  *
+		  * Due to it uses [[ClassTag]] to fetch the type information, the class of value used
+		  * by this method may be not the parameter's accurate class but the compile time class
+		  * (the class that uses in typecheck). If you want the accurate class used, you need
+		  * to use `.accept(i.getClass())`.
+		  *
+		  * @since 0.3.0
+		  */
 		infix def ?#- [T: ClassTag] (i: T): Boolean
 		
 	}
