@@ -22,7 +22,7 @@ ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / resolvers ++= ProjectMetadata.resolvers
 
 val encoding = "UTF-8"
-val javaTarget = "11"
+val javaTarget = "12"
 val javaTarget_scala = javaTarget
 
 lazy val root = (project in file("."))
